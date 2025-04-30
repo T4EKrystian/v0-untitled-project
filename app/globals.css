@@ -1,0 +1,820 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-sans tracking-tight;
+  }
+}
+
+/* Animation delays */
+.animation-delay-100 {
+  animation-delay: 0.1s;
+}
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+.animation-delay-300 {
+  animation-delay: 0.3s;
+}
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+.animation-delay-600 {
+  animation-delay: 0.6s;
+}
+.animation-delay-700 {
+  animation-delay: 0.7s;
+}
+.animation-delay-800 {
+  animation-delay: 0.8s;
+}
+
+/* Luxury UI Components */
+.btn-modern {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateY(0);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.btn-modern:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.6s ease;
+  z-index: -1;
+}
+
+.btn-modern:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 25px rgba(212, 175, 105, 0.25);
+}
+
+.btn-modern:hover:before {
+  left: 100%;
+}
+
+.glass-card {
+  @apply bg-white/80 backdrop-blur-md;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+}
+
+.text-shadow-lg {
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.text-shadow-gold {
+  text-shadow: 0 2px 10px rgba(212, 175, 105, 0.3);
+}
+
+/* Premium design elements */
+.premium-card {
+  @apply bg-white border-0 rounded-md overflow-hidden transition-all duration-300;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.premium-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  transform: translateY(-4px);
+}
+
+.premium-button {
+  @apply rounded-md font-semibold transition-all duration-300;
+  letter-spacing: 0.01em;
+}
+
+.premium-button:hover {
+  transform: translateY(-2px);
+}
+
+.premium-input {
+  @apply border border-gray-100 bg-white rounded-md;
+  transition: all 0.2s ease;
+}
+
+.premium-input:focus {
+  @apply border-gold-200 ring-1 ring-gold-100;
+  box-shadow: 0 0 0 1px rgba(212, 175, 105, 0.1);
+}
+
+.premium-badge {
+  @apply inline-block rounded-md px-3 py-1 text-xs font-semibold;
+  letter-spacing: 0.05em;
+  background: linear-gradient(to right, rgba(212, 175, 105, 0.08), rgba(212, 175, 105, 0.15));
+}
+
+.premium-section {
+  @apply relative overflow-hidden;
+}
+
+.premium-divider {
+  height: 1px;
+  @apply bg-navy-50 my-12;
+}
+
+.premium-shadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.premium-glass {
+  @apply backdrop-blur-md bg-white/90;
+}
+
+/* Dodaj nową klasę dla naprzemiennych sekcji */
+.section-light {
+  @apply bg-white;
+}
+
+.section-dark {
+  @apply bg-cream;
+}
+
+/* Dodaj klasę dla gradientów premium */
+.premium-gradient {
+  background: linear-gradient(to bottom, #0f3460, #092747);
+}
+
+.premium-gradient-gold {
+  background: linear-gradient(135deg, #b98b4c 0%, #d4af69 50%, #e5c07a 100%);
+}
+
+/* Geometric shapes */
+.geometric-shape {
+  @apply absolute pointer-events-none opacity-5;
+  z-index: 0;
+}
+
+.geometric-circle {
+  @apply rounded-full;
+  background: linear-gradient(135deg, #d4af69 0%, #e5c07a 100%);
+}
+
+.geometric-square {
+  background: linear-gradient(135deg, #d4af69 0%, #e5c07a 100%);
+}
+
+.geometric-triangle {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  background: linear-gradient(135deg, #d4af69 0%, #e5c07a 100%);
+}
+
+.geometric-rectangle {
+  background: linear-gradient(135deg, #d4af69 0%, #e5c07a 100%);
+}
+
+.geometric-line {
+  height: 1px;
+  width: 100px;
+  background: linear-gradient(90deg, transparent, #d4af69, transparent);
+}
+
+/* Designer decorative elements */
+.designer-circle {
+  @apply absolute rounded-full;
+  border: 1px solid rgba(212, 175, 105, 0.08);
+}
+
+.designer-square {
+  @apply absolute;
+  border: 1px solid rgba(212, 175, 105, 0.08);
+}
+
+.designer-dash {
+  @apply inline-block w-5 h-px bg-gold-400 mx-2 align-middle;
+}
+
+.designer-dot {
+  @apply inline-block w-1 h-1 bg-gold-400 mx-2 rounded-full align-middle;
+}
+
+/* Enhanced subtle animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Scroll animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Enhanced reveal animations with different directions */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.reveal-left.active,
+.reveal-right.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Enhanced gradient text */
+.gradient-text {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #d4af69 0%, #e5c07a 100%);
+}
+
+.gradient-text-premium {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #b98b4c 0%, #d4af69 50%, #e5c07a 100%);
+  background-size: 200% auto;
+  animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Luxury styling */
+.luxury-heading {
+  @apply font-bold tracking-tight leading-tight;
+}
+
+.border-gold {
+  @apply border-gold-400;
+}
+
+.text-gold {
+  @apply text-gold-400;
+}
+
+.shadow-gold {
+  box-shadow: 0 4px 20px rgba(212, 175, 105, 0.15);
+}
+
+.hover-shadow-gold:hover {
+  box-shadow: 0 8px 30px rgba(212, 175, 105, 0.2);
+}
+
+/* Dot pattern and grids */
+.dot-pattern {
+  background-image: radial-gradient(circle, rgba(15, 52, 96, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.05;
+}
+
+.minimal-grid {
+  background-size: 20px 20px;
+  background-image: linear-gradient(to right, rgba(15, 52, 96, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 52, 96, 0.05) 1px, transparent 1px);
+}
+
+/* Modern UI elements */
+.modern-button {
+  @apply bg-gradient-to-r from-gold to-gold-dark text-white 
+    hover:from-gold-light hover:to-gold 
+    shadow-md hover:shadow-lg hover:scale-105
+    transition-all duration-300 transform;
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-button:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.6s ease;
+  z-index: 1;
+}
+
+.modern-button:hover:before {
+  left: 100%;
+}
+
+.modern-card {
+  @apply border border-gold/20 shadow-gold rounded-lg 
+    hover:shadow-gold-lg hover:border-gold/30
+    transition-all duration-300;
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-card:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 105, 0.3), transparent);
+}
+
+.modern-section {
+  @apply bg-cream py-20 md:py-32 relative overflow-hidden;
+}
+
+.modern-badge {
+  @apply bg-gold/10 text-gold-dark px-3 py-1 text-sm font-semibold rounded-md;
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-badge:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 105, 0.2), transparent);
+  transition: all 1.5s ease;
+  z-index: 1;
+}
+
+.modern-badge:hover:before {
+  left: 100%;
+}
+
+.modern-divider {
+  @apply h-px bg-gold/20 my-8;
+  position: relative;
+}
+
+.modern-divider:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 105, 0.5), transparent);
+}
+
+/* Text styling */
+.navy-text {
+  @apply text-navy;
+}
+
+.gold-text {
+  @apply text-gold;
+}
+
+.luxury-number {
+  @apply text-gold font-semibold;
+}
+
+/* Luxury decorative elements */
+.luxury-border {
+  position: relative;
+}
+
+.luxury-border:before,
+.luxury-border:after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: rgba(212, 175, 105, 0.3);
+  border-style: solid;
+}
+
+.luxury-border:before {
+  top: 0;
+  left: 0;
+  border-width: 1px 0 0 1px;
+}
+
+.luxury-border:after {
+  bottom: 0;
+  right: 0;
+  border-width: 0 1px 1px 0;
+}
+
+/* 3D effect for cards */
+.card-3d {
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.card-3d:hover {
+  transform: rotateX(5deg) rotateY(5deg);
+}
+
+/* Luxury image frame */
+.luxury-frame {
+  position: relative;
+  padding: 10px;
+}
+
+.luxury-frame:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid rgba(212, 175, 105, 0.2);
+  z-index: 1;
+}
+
+.luxury-frame:after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border: 1px solid rgba(212, 175, 105, 0.1);
+  z-index: 1;
+}
+
+/* Subtle pattern overlay */
+.pattern-overlay {
+  position: relative;
+}
+
+.pattern-overlay:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4af69' fill-opacity='0.03' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3Ccircle cx='13' cy='13' r='1'/%3E%3C/g%3E%3C/svg%3E");
+  z-index: -1;
+}
+
+/* Animated gradient border */
+.gradient-border {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.gradient-border:before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #d4af69, transparent, #d4af69, transparent);
+  background-size: 400% 400%;
+  animation: gradient-animation 3s ease infinite;
+  z-index: -1;
+  border-radius: 0.6rem;
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Floating animation */
+.floating {
+  animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Elegant hover effect for links */
+.elegant-link {
+  position: relative;
+  display: inline-block;
+}
+
+.elegant-link:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 105, 0.8), transparent);
+  transform-origin: bottom right;
+  transition: transform 0.3s ease-out;
+}
+
+.elegant-link:hover:after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Adjust spacing in globals.css */
+.section-light,
+.section-dark {
+  @apply py-8 sm:py-12 md:py-16;
+}
+
+/* Reduce spacing in SectionTitle component */
+
+/* Adjust card padding */
+.card-content {
+  @apply p-3 sm:p-4;
+}
+
+/* Adjust spacing in text elements */
+p {
+  @apply mb-3;
+}
+
+h2 {
+  @apply mb-3 sm:mb-4;
+}
+
+h3 {
+  @apply mb-2 sm:mb-3;
+}
+
+/* Adjust container padding for mobile */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* Adjust grid gaps */
+.grid-gap-reduced {
+  @apply gap-3 sm:gap-4 md:gap-6;
+}
+
+/* Adjust vertical margins */
+.my-reduced {
+  @apply my-3 sm:my-4 md:my-6;
+}
+
+/* Adjust padding in cards and sections */
+.p-reduced {
+  @apply p-3 sm:p-4 md:p-6;
+}
+
+/* Dodaj te style na końcu pliku globals.css */
+
+/* Optymalizacja mobilna */
+@media (max-width: 768px) {
+  /* Poprawki dla przycisków na urządzeniach mobilnych */
+  button,
+  .btn-modern,
+  .premium-button,
+  .modern-button {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Zwiększenie obszarów klikania dla linków i przycisków */
+  a,
+  button,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Poprawki dla formularzy na urządzeniach mobilnych */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important; /* Zapobiega powiększaniu na iOS */
+  }
+
+  /* Poprawki dla czcionek na urządzeniach mobilnych */
+  .text-xs {
+    font-size: 0.75rem !important;
+  }
+
+  .text-sm {
+    font-size: 0.875rem !important;
+  }
+
+  .text-base {
+    font-size: 1rem !important;
+  }
+
+  .text-lg {
+    font-size: 1.125rem !important;
+  }
+
+  .text-xl {
+    font-size: 1.25rem !important;
+  }
+
+  .text-2xl {
+    font-size: 1.5rem !important;
+  }
+
+  .text-3xl {
+    font-size: 1.75rem !important;
+  }
+
+  /* Poprawki dla odstępów na urządzeniach mobilnych */
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Poprawki dla animacji na urządzeniach mobilnych */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Poprawki dla dostępności */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Poprawki dla kontrastu */
+.text-gray-300\/80 {
+  color: rgba(209, 213, 219, 0.9) !important;
+}
+
+.text-gray-500 {
+  color: rgba(107, 114, 128, 0.95) !important;
+}
+
+.text-navy-light\/80 {
+  color: rgba(76, 117, 163, 0.95) !important;
+}
+
+/* Image slider styles */
+.hero-image {
+  transition: opacity 1s ease-in-out;
+}
+
+/* Enhanced text contrast for hero section */
+.hero-section h1,
+.hero-section p {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Improved backdrop blur */
+.backdrop-blur-md {
+  backdrop-filter: blur(8px);
+}
+
+/* Enhanced card styles for dark backgrounds */
+.bg-navy-50\/20 {
+  background-color: rgba(237, 242, 247, 0.2);
+}
+
+/* Improved gold accents */
+.text-gold-300 {
+  color: #e5c07a;
+  text-shadow: 0 0 10px rgba(212, 175, 105, 0.3);
+}
+
+/* Enhanced image navigation */
+.image-nav-button {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.image-nav-button:hover {
+  opacity: 1;
+}
+
+/* Improved indicator dots */
+.indicator-dot {
+  transition: all 0.3s ease;
+}
+
+.indicator-dot.active {
+  width: 24px;
+}
