@@ -4,11 +4,14 @@ import { useState } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { SectionTitle } from "@/components/ui/section-title"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export function DubaiLuxuryGallery() {
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [currentImage, setCurrentImage] = useState(0)
+  const isMobile = useIsMobile()
 
+  // Ograniczamy liczbę obrazów na mobile dla lepszej wydajności
   const luxuryImages = [
     {
       src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/img200.jpg-3DTts0yMsMdTpwZwhptmFcDXubDvuG.jpeg",
@@ -40,21 +43,26 @@ export function DubaiLuxuryGallery() {
       alt: "Luksusowe apartamenty z widokiem na panoramę Dubaju",
       description: "Apartamenty z basenami na balkonach i spektakularnym widokiem na miasto",
     },
-    {
-      src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/img171.jpg-aAJFvIjsE4wMlkFoKCA0YZ9AfTlAY8.jpeg",
-      alt: "Panorama Dubaju o zachodzie słońca z Burj Khalifa",
-      description: "Zapierająca dech w piersiach panorama Dubaju z najwyższym budynkiem świata",
-    },
-    {
-      src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/0.jpg-R73xuSQOEqOGZes4ofRhtrQQimUpIb.jpeg",
-      alt: "Falujący kompleks mieszkalny z ogrodem na dachu",
-      description: "Organiczna architektura z rozległymi terenami zielonymi i basenami",
-    },
-    {
-      src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7.jpg-3AvH9pvHFUPo20rnShEFTEoKgpjp7Q.jpeg",
-      alt: "Wodospad w luksusowym kompleksie mieszkalnym",
-      description: "Spektakularny wodospad w dziedzińcu ekskluzywnego kompleksu mieszkalnego",
-    },
+    // Pozostałe obrazy pokazujemy tylko na desktopie
+    ...(isMobile
+      ? []
+      : [
+          {
+            src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/img171.jpg-aAJFvIjsE4wMlkFoKCA0YZ9AfTlAY8.jpeg",
+            alt: "Panorama Dubaju o zachodzie słońca z Burj Khalifa",
+            description: "Zapierająca dech w piersiach panorama Dubaju z najwyższym budynkiem świata",
+          },
+          {
+            src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/0.jpg-R73xuSQOEqOGZes4ofRhtrQQimUpIb.jpeg",
+            alt: "Falujący kompleks mieszkalny z ogrodem na dachu",
+            description: "Organiczna architektura z rozległymi terenami zielonymi i basenami",
+          },
+          {
+            src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7.jpg-3AvH9pvHFUPo20rnShEFTEoKgpjp7Q.jpeg",
+            alt: "Wodospad w luksusowym kompleksie mieszkalnym",
+            description: "Spektakularny wodospad w dziedzińcu ekskluzywnego kompleksu mieszkalnego",
+          },
+        ]),
   ]
 
   const openLightbox = (index: number) => {
@@ -78,19 +86,19 @@ export function DubaiLuxuryGallery() {
 
   return (
     <section className="py-8 sm:py-12 md:py-16 section-light modern-section relative overflow-hidden">
-      {/* Designer decorative elements */}
-      <div className="designer-circle w-96 h-96 opacity-10 top-[10%] right-[10%]"></div>
-      <div className="designer-circle w-80 h-80 opacity-10 bottom-[20%] left-[5%]"></div>
-      <div className="designer-square w-60 h-60 opacity-10 top-[40%] left-[10%] rotate-12"></div>
-
-      {/* Abstract blurred elements */}
-      <div className="blurred-dots top-40 right-[15%]"></div>
-      <div className="blurred-dots bottom-40 left-[20%]"></div>
-
-      {/* Geometric shapes */}
-      <div className="geometric-shape geometric-square w-72 h-72 -top-36 -right-36 rotate-12"></div>
-      <div className="geometric-shape geometric-circle w-96 h-96 -bottom-48 -left-48"></div>
-      <div className="absolute inset-0 subtle-grid opacity-30"></div>
+      {/* Designer decorative elements - ukryte na mobile dla lepszej wydajności */}
+      {!isMobile && (
+        <>
+          <div className="designer-circle w-96 h-96 opacity-10 top-[10%] right-[10%]"></div>
+          <div className="designer-circle w-80 h-80 opacity-10 bottom-[20%] left-[5%]"></div>
+          <div className="designer-square w-60 h-60 opacity-10 top-[40%] left-[10%] rotate-12"></div>
+          <div className="blurred-dots top-40 right-[15%]"></div>
+          <div className="blurred-dots bottom-40 left-[20%]"></div>
+          <div className="geometric-shape geometric-square w-72 h-72 -top-36 -right-36 rotate-12"></div>
+          <div className="geometric-shape geometric-circle w-96 h-96 -bottom-48 -left-48"></div>
+          <div className="absolute inset-0 subtle-grid opacity-30"></div>
+        </>
+      )}
 
       <div className="container relative z-10">
         <SectionTitle
@@ -117,6 +125,7 @@ export function DubaiLuxuryGallery() {
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  loading={index < 3 ? "eager" : "lazy"}
                 />
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-800/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
@@ -167,6 +176,7 @@ export function DubaiLuxuryGallery() {
                 fill
                 className="object-contain"
                 sizes="100vw"
+                priority
               />
             </div>
             <div className="bg-black/50 backdrop-blur-sm p-4 mt-4 rounded-md max-w-3xl">

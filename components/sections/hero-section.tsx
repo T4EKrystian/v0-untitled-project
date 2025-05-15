@@ -6,6 +6,7 @@ import Image from "next/image"
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { WebinarForm } from "@/components/webinar-form"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface HeroSectionProps {
   onCtaClick?: (e: React.MouseEvent) => void
@@ -13,6 +14,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ onCtaClick }: HeroSectionProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const isMobile = useIsMobile()
 
   const heroImages = [
     {
@@ -33,17 +35,21 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
     },
   ]
 
-  // Auto-rotate images
+  // Auto-rotate images - tylko na desktopie dla lepszej wydajności
   useEffect(() => {
+    if (isMobile) return
+
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length)
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [heroImages.length])
+  }, [heroImages.length, isMobile])
 
-  // Add scroll animation
+  // Add scroll animation - tylko na desktopie dla lepszej wydajności
   useEffect(() => {
+    if (isMobile) return
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -63,7 +69,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
     return () => {
       revealElements.forEach((el) => observer.unobserve(el))
     }
-  }, [])
+  }, [isMobile])
 
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length)
@@ -91,65 +97,84 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
 
   return (
     <section className="relative min-h-[80vh] md:min-h-screen flex items-center overflow-hidden section-light pattern-overlay">
-      {/* Designer decorative elements */}
-      <div className="designer-circle w-80 h-80 opacity-10 top-40 left-20"></div>
-      <div className="designer-circle w-60 h-60 opacity-10 bottom-40 right-[35%]"></div>
-      <div className="designer-square w-40 h-40 opacity-10 top-[30%] right-20 rotate-12"></div>
-
-      {/* Geometric shapes */}
-      <div className="geometric-shape geometric-circle w-96 h-96 -top-48 -left-48"></div>
-      <div className="geometric-shape geometric-square w-64 h-64 bottom-20 -right-32 rotate-45"></div>
-      <div className="absolute inset-0 minimal-grid opacity-30"></div>
+      {/* Designer decorative elements - ukryte na mobile dla lepszej wydajności */}
+      {!isMobile && (
+        <>
+          <div className="designer-circle w-80 h-80 opacity-10 top-40 left-20"></div>
+          <div className="designer-circle w-60 h-60 opacity-10 bottom-40 right-[35%]"></div>
+          <div className="designer-square w-40 h-40 opacity-10 top-[30%] right-20 rotate-12"></div>
+          <div className="geometric-shape geometric-circle w-96 h-96 -top-48 -left-48"></div>
+          <div className="geometric-shape geometric-square w-64 h-64 bottom-20 -right-32 rotate-45"></div>
+          <div className="absolute inset-0 minimal-grid opacity-30"></div>
+        </>
+      )}
 
       {/* Image slider */}
       <div className="absolute inset-0 z-0">
-        {heroImages.map((image, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentImageIndex ? "opacity-100" : "opacity-0"
-            }`}
-          >
+        {/* Na mobile pokazujemy tylko pierwszy obraz dla lepszej wydajności */}
+        {isMobile ? (
+          <div className="absolute inset-0">
             <Image
-              src={image.src || "/placeholder.svg"}
-              alt={image.alt}
+              src={heroImages[0].src || "/placeholder.svg"}
+              alt={heroImages[0].alt}
               fill
               className="object-cover"
-              priority={index === 0}
+              priority={true}
             />
             <div className="absolute inset-0 bg-black/40"></div>
           </div>
-        ))}
-
-        {/* Navigation arrows */}
-        <button
-          onClick={prevImage}
-          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 rounded-full p-1 sm:p-2 backdrop-blur-sm transition-all duration-300"
-          aria-label="Previous image"
-        >
-          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-        </button>
-        <button
-          onClick={nextImage}
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 rounded-full p-1 sm:p-2 backdrop-blur-sm transition-all duration-300"
-          aria-label="Next image"
-        >
-          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-        </button>
-
-        {/* Image indicators - hidden on mobile */}
-        <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-10 hidden sm:flex space-x-2">
-          {heroImages.map((_, index) => (
-            <button
+        ) : (
+          // Na desktopie pokazujemy slider
+          heroImages.map((image, index) => (
+            <div
               key={index}
-              onClick={() => setCurrentImageIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentImageIndex ? "bg-gold w-6" : "bg-white/50 hover:bg-white"
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentImageIndex ? "opacity-100" : "opacity-0"
               }`}
-              aria-label={`Go to image ${index + 1}`}
-            />
-          ))}
-        </div>
+            >
+              <Image
+                src={image.src || "/placeholder.svg"}
+                alt={image.alt}
+                fill
+                className="object-cover"
+                priority={index === 0}
+              />
+              <div className="absolute inset-0 bg-black/40"></div>
+            </div>
+          ))
+        )}
+
+        {/* Navigation arrows - tylko na desktopie */}
+        {!isMobile && (
+          <>
+            <button
+              onClick={prevImage}
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 rounded-full p-1 sm:p-2 backdrop-blur-sm transition-all duration-300"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 rounded-full p-1 sm:p-2 backdrop-blur-sm transition-all duration-300"
+              aria-label="Next image"
+            >
+              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+            </button>
+            <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-10 hidden sm:flex space-x-2">
+              {heroImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentImageIndex ? "bg-gold w-6" : "bg-white/50 hover:bg-white"
+                  }`}
+                  aria-label={`Go to image ${index + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="container relative z-10 pt-6 pb-8 md:pt-10 md:pb-16">

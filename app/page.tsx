@@ -24,10 +24,12 @@ import { PropertyValueSection } from "@/components/sections/property-value-secti
 import { InvestmentProcessSection } from "@/components/sections/investment-process-section"
 import { SocialProofBar } from "@/components/social-proof-bar"
 import { DubaiLuxuryGallery } from "@/components/sections/dubai-luxury-gallery"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export default function LandingPage() {
   const webinarDate = "May 15, 2025 19:00:00"
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   // Function to open the form popup
   const openForm = () => {
@@ -45,8 +47,11 @@ export default function LandingPage() {
     openForm()
   }
 
-  // Add scroll animation
+  // Add scroll animation with performance optimization
   useEffect(() => {
+    // Skip animations on mobile for better performance
+    if (isMobile) return
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -57,6 +62,7 @@ export default function LandingPage() {
       },
       {
         threshold: 0.1,
+        rootMargin: "0px 0px 50px 0px",
       },
     )
 
@@ -66,7 +72,7 @@ export default function LandingPage() {
     return () => {
       revealElements.forEach((el) => observer.unobserve(el))
     }
-  }, [])
+  }, [isMobile])
 
   return (
     <div className="flex min-h-screen flex-col bg-cream text-navy">

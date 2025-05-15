@@ -4,12 +4,15 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { SectionTitle } from "@/components/ui/section-title"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export function PropertyGallerySection() {
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxImage, setLightboxImage] = useState("")
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const isMobile = useIsMobile()
 
+  // Ograniczamy liczbę nieruchomości na mobile dla lepszej wydajności
   const properties = [
     {
       id: 1,
@@ -47,46 +50,53 @@ export function PropertyGallerySection() {
       location: "Jumeirah Beach Residence",
       image: "/images/costa-mare.jpeg",
     },
-    {
-      id: 7,
-      title: "Claydon House",
-      location: "Dubai Sports City",
-      image: "/images/claydon-house.jpeg",
-    },
-    {
-      id: 8,
-      title: "Belgravia Gardens",
-      location: "Jumeirah Village Circle",
-      image: "/images/belgravia-gardens.jpeg",
-    },
-    {
-      id: 9,
-      title: "Belgravia Square",
-      location: "Dubai International Financial Centre",
-      image: "/images/belgravia-square-pool.jpeg",
-    },
-    {
-      id: 10,
-      title: "Arbor View",
-      location: "Dubai Creek Harbour",
-      image: "/images/arbor-view-exterior.jpeg",
-    },
-    {
-      id: 11,
-      title: "Arbor Residences",
-      location: "Emirates Hills",
-      image: "/images/arbor-view-caravan.jpeg",
-    },
-    {
-      id: 12,
-      title: "Palm Terraces",
-      location: "Palm Jumeirah",
-      image: "/images/costa-mare.jpeg",
-    },
+    // Pozostałe nieruchomości pokazujemy tylko na desktopie
+    ...(isMobile
+      ? []
+      : [
+          {
+            id: 7,
+            title: "Claydon House",
+            location: "Dubai Sports City",
+            image: "/images/claydon-house.jpeg",
+          },
+          {
+            id: 8,
+            title: "Belgravia Gardens",
+            location: "Jumeirah Village Circle",
+            image: "/images/belgravia-gardens.jpeg",
+          },
+          {
+            id: 9,
+            title: "Belgravia Square",
+            location: "Dubai International Financial Centre",
+            image: "/images/belgravia-square-pool.jpeg",
+          },
+          {
+            id: 10,
+            title: "Arbor View",
+            location: "Dubai Creek Harbour",
+            image: "/images/arbor-view-exterior.jpeg",
+          },
+          {
+            id: 11,
+            title: "Arbor Residences",
+            location: "Emirates Hills",
+            image: "/images/arbor-view-caravan.jpeg",
+          },
+          {
+            id: 12,
+            title: "Palm Terraces",
+            location: "Palm Jumeirah",
+            image: "/images/costa-mare.jpeg",
+          },
+        ]),
   ]
 
-  // Add scroll animation
+  // Add scroll animation - tylko na desktopie dla lepszej wydajności
   useEffect(() => {
+    if (isMobile) return
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -106,7 +116,7 @@ export function PropertyGallerySection() {
     return () => {
       revealElements.forEach((el) => observer.unobserve(el))
     }
-  }, [])
+  }, [isMobile])
 
   const openLightbox = (index) => {
     setLightboxImage(properties[index].image)
@@ -132,19 +142,19 @@ export function PropertyGallerySection() {
 
   return (
     <section id="properties" className="py-8 sm:py-12 md:py-16 section-dark modern-section relative overflow-hidden">
-      {/* Designer decorative elements */}
-      <div className="designer-circle w-96 h-96 opacity-10 top-[10%] right-[10%]"></div>
-      <div className="designer-circle w-80 h-80 opacity-10 bottom-[20%] left-[5%]"></div>
-      <div className="designer-square w-60 h-60 opacity-10 top-[40%] left-[10%] rotate-12"></div>
-
-      {/* Abstract blurred elements */}
-      <div className="blurred-dots top-40 right-[15%]"></div>
-      <div className="blurred-dots bottom-40 left-[20%]"></div>
-
-      {/* Geometric shapes */}
-      <div className="geometric-shape geometric-square w-72 h-72 -top-36 -right-36 rotate-12"></div>
-      <div className="geometric-shape geometric-circle w-96 h-96 -bottom-48 -left-48"></div>
-      <div className="absolute inset-0 subtle-grid opacity-30"></div>
+      {/* Designer decorative elements - ukryte na mobile dla lepszej wydajności */}
+      {!isMobile && (
+        <>
+          <div className="designer-circle w-96 h-96 opacity-10 top-[10%] right-[10%]"></div>
+          <div className="designer-circle w-80 h-80 opacity-10 bottom-[20%] left-[5%]"></div>
+          <div className="designer-square w-60 h-60 opacity-10 top-[40%] left-[10%] rotate-12"></div>
+          <div className="blurred-dots top-40 right-[15%]"></div>
+          <div className="blurred-dots bottom-40 left-[20%]"></div>
+          <div className="geometric-shape geometric-square w-72 h-72 -top-36 -right-36 rotate-12"></div>
+          <div className="geometric-shape geometric-circle w-96 h-96 -bottom-48 -left-48"></div>
+          <div className="absolute inset-0 subtle-grid opacity-30"></div>
+        </>
+      )}
 
       <div className="container relative z-10">
         <SectionTitle
@@ -172,6 +182,7 @@ export function PropertyGallerySection() {
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  loading={index < 3 ? "eager" : "lazy"}
                 />
               </div>
 
@@ -322,6 +333,7 @@ export function PropertyGallerySection() {
               fill
               className="object-contain"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+              priority
             />
           </div>
         </div>
