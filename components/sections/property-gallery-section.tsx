@@ -119,6 +119,7 @@ export function PropertyGallerySection() {
   }, [isMobile])
 
   const openLightbox = (index) => {
+    if (isMobile) return // Na mobile nie otwieramy lightboxa
     setLightboxImage(properties[index].image)
     setCurrentImageIndex(index)
     setLightboxOpen(true)
@@ -171,16 +172,18 @@ export function PropertyGallerySection() {
           {properties.map((property, index) => (
             <div
               key={property.id}
-              className="group relative h-[240px] sm:h-[280px] rounded-xl overflow-hidden shadow-gold hover-lift luxury-frame reveal"
+              className={`group relative h-[240px] sm:h-[280px] rounded-xl overflow-hidden shadow-gold luxury-frame reveal ${
+                !isMobile ? "hover-lift cursor-pointer" : ""
+              }`}
               style={{ animationDelay: `${index * 0.05}s` }}
-              onClick={() => openLightbox(index)}
+              onClick={isMobile ? undefined : () => openLightbox(index)}
             >
               <div className="absolute inset-0 w-full h-full">
                 <Image
                   src={property.image || "/placeholder.svg"}
                   alt={property.title}
                   fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  className={`object-cover ${!isMobile ? "transition-transform duration-500 group-hover:scale-110" : ""}`}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   loading={index < 3 ? "eager" : "lazy"}
                 />
@@ -311,8 +314,8 @@ export function PropertyGallerySection() {
         </div>
       </div>
 
-      {/* Lightbox */}
-      {lightboxOpen && (
+      {/* Lightbox - tylko dla wersji desktopowej */}
+      {!isMobile && lightboxOpen && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
           <button
             onClick={closeLightbox}

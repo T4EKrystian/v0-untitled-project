@@ -12,34 +12,41 @@ export function DubaiLuxuryGallery() {
   const isMobile = useIsMobile()
 
   // Ograniczamy liczbę obrazów na mobile dla lepszej wydajności
+  // i używamy obrazów o niższej rozdzielczości dla mobile
   const luxuryImages = [
     {
       src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/img200.jpg-3DTts0yMsMdTpwZwhptmFcDXubDvuG.jpeg",
+      smallSrc: "/images/dubai-marina.png", // Użyj mniejszego obrazu dla mobile
       alt: "Widok z lotu ptaka na sztuczną wyspę Palm Jumeirah w Dubaju",
       description: "Ikoniczna wyspa Palm Jumeirah - architektoniczny cud Dubaju",
     },
     {
       src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/10.jpg-bJKta0hHzTYlutT8FIqWNAyzNu67jM.jpeg",
+      smallSrc: "/images/palm-jumeirah.png", // Użyj mniejszego obrazu dla mobile
       alt: "Nowoczesne wieżowce mieszkalne w Dubaju",
       description: "Luksusowe apartamentowce z innowacyjną architekturą i zielonymi tarasami",
     },
     {
       src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/17.jpg-M0U9NIwseZS8v2kDVhydAECsyP28VZ.jpeg",
+      smallSrc: "/images/burj-khalifa.png", // Użyj mniejszego obrazu dla mobile
       alt: "Kompleks mieszkalny z kolorowym placem i terenami zielonymi",
       description: "Nowoczesny kompleks mieszkalny z unikalnymi przestrzeniami publicznymi",
     },
     {
       src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/img23.jpg-KpBrgJWavecSq03JSfOLxQgssJnTsf.jpeg",
+      smallSrc: "/images/dubai-mall.png", // Użyj mniejszego obrazu dla mobile
       alt: "Luksusowy kompleks mieszkalny nad wodą w Dubaju",
       description: "Ekskluzywne apartamenty z bezpośrednim dostępem do wody i prywatnej plaży",
     },
     {
       src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/img90.jpg-2Hj28ngbcSrxibbTeUkUTRvpspgbJ7.jpeg",
+      smallSrc: "/images/museum-of-the-future.png", // Użyj mniejszego obrazu dla mobile
       alt: "Apartamentowiec z falującą fasadą przy plaży",
       description: "Innowacyjna architektura z bezpośrednim dostępem do piaszczystej plaży",
     },
     {
       src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/27.jpg-y49BDV14YjFkrD6tmSZOBtzabuHzgZ.jpeg",
+      smallSrc: "/images/ain-dubai.png", // Użyj mniejszego obrazu dla mobile
       alt: "Luksusowe apartamenty z widokiem na panoramę Dubaju",
       description: "Apartamenty z basenami na balkonach i spektakularnym widokiem na miasto",
     },
@@ -49,16 +56,19 @@ export function DubaiLuxuryGallery() {
       : [
           {
             src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/img171.jpg-aAJFvIjsE4wMlkFoKCA0YZ9AfTlAY8.jpeg",
+            smallSrc: "/images/dubai-marina.png",
             alt: "Panorama Dubaju o zachodzie słońca z Burj Khalifa",
             description: "Zapierająca dech w piersiach panorama Dubaju z najwyższym budynkiem świata",
           },
           {
             src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/0.jpg-R73xuSQOEqOGZes4ofRhtrQQimUpIb.jpeg",
+            smallSrc: "/images/dubai-marina.png",
             alt: "Falujący kompleks mieszkalny z ogrodem na dachu",
             description: "Organiczna architektura z rozległymi terenami zielonymi i basenami",
           },
           {
             src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7.jpg-3AvH9pvHFUPo20rnShEFTEoKgpjp7Q.jpeg",
+            smallSrc: "/images/dubai-marina.png",
             alt: "Wodospad w luksusowym kompleksie mieszkalnym",
             description: "Spektakularny wodospad w dziedzińcu ekskluzywnego kompleksu mieszkalnego",
           },
@@ -66,6 +76,7 @@ export function DubaiLuxuryGallery() {
   ]
 
   const openLightbox = (index: number) => {
+    if (isMobile) return // Na mobile nie otwieramy lightboxa
     setCurrentImage(index)
     setLightboxOpen(true)
     document.body.style.overflow = "hidden"
@@ -115,22 +126,31 @@ export function DubaiLuxuryGallery() {
           {luxuryImages.map((image, index) => (
             <div
               key={index}
-              className="group relative overflow-hidden rounded-lg shadow-gold hover:shadow-gold-lg transition-all duration-300 cursor-pointer hover:-translate-y-1 aspect-[4/3]"
-              onClick={() => openLightbox(index)}
+              className={`group relative overflow-hidden rounded-lg shadow-gold transition-all duration-300 aspect-[4/3] ${
+                !isMobile ? "hover:shadow-gold-lg cursor-pointer hover:-translate-y-1" : ""
+              }`}
+              onClick={isMobile ? undefined : () => openLightbox(index)}
             >
               <div className="absolute inset-0">
                 <Image
-                  src={image.src || "/placeholder.svg"}
+                  src={isMobile ? image.smallSrc : image.src || "/placeholder.svg"}
                   alt={image.alt}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  className={`object-cover ${!isMobile ? "transition-transform duration-700 group-hover:scale-110" : ""}`}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   loading={index < 3 ? "eager" : "lazy"}
                 />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-800/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                <p className="text-white font-medium text-sm md:text-base">{image.description}</p>
-              </div>
+              {!isMobile && (
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-800/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                  <p className="text-white font-medium text-sm md:text-base">{image.description}</p>
+                </div>
+              )}
+              {isMobile && (
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-900/80 via-navy-800/30 to-transparent flex items-end p-3">
+                  <p className="text-white font-medium text-xs">{image.description}</p>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -143,8 +163,8 @@ export function DubaiLuxuryGallery() {
         </div>
       </div>
 
-      {/* Lightbox */}
-      {lightboxOpen && (
+      {/* Lightbox - tylko dla wersji desktopowej */}
+      {!isMobile && lightboxOpen && (
         <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
           <button
             onClick={closeLightbox}
