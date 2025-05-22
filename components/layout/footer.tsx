@@ -11,11 +11,11 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Building2 className="h-5 w-5 text-gold" strokeWidth={1.5} />
-              <span className="text-lg font-semibold">Dubai Invest</span>
+              <span className="text-lg font-semibold">Dubai Business</span>
             </div>
             <p className="text-gray-300/80">
-              Dubai Invest – pomagamy inwestorom z Polski wejść na rynek nieruchomości w Dubaju w bezpieczny i
-              zoptymalizowany sposób.
+              Dubai Business – pomagamy przedsiębiorcom z całego świata zakładać i prowadzić firmy w Dubaju, korzystając
+              z licznych przywilejów podatkowych i biznesowych.
             </p>
           </div>
           <div>
@@ -61,10 +61,10 @@ export function Footer() {
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-gold" strokeWidth={1.5} />
                 <Link
-                  href="mailto:kontakt@dubaiinvest.pl"
+                  href="mailto:kontakt@dubaibusiness.pl"
                   className="text-gray-300/80 hover:text-gold-300 transition-colors duration-200"
                 >
-                  kontakt@dubaiinvest.pl
+                  kontakt@dubaibusiness.pl
                 </Link>
               </li>
               <li className="flex items-center gap-3">
@@ -85,7 +85,7 @@ export function Footer() {
           <div>
             <h3 className="text-base font-semibold mb-3 sm:mb-4">Newsletter</h3>
             <p className="text-gray-300/80 mb-3">
-              Zapisz się, aby otrzymywać najnowsze informacje o rynku nieruchomości w Dubaju.
+              Zapisz się, aby otrzymywać najnowsze informacje o prowadzeniu biznesu w Dubaju.
             </p>
             <form className="space-y-2 sm:space-y-3">
               <Input
@@ -100,7 +100,7 @@ export function Footer() {
         </div>
         <div className="h-px bg-navy/5 my-6 sm:my-8"></div>
         <div className="text-center text-navy/40">
-          <p>© {new Date().getFullYear()} Dubai Invest. Wszelkie prawa zastrzeżone.</p>
+          <p>© {new Date().getFullYear()} Dubai Business. Wszelkie prawa zastrzeżone.</p>
         </div>
       </div>
     </footer>

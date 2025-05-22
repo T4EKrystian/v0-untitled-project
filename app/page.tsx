@@ -6,30 +6,22 @@ import { useEffect } from "react"
 import { useState } from "react"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { CountdownTimer } from "@/components/countdown-timer"
 import { FloatingCTA } from "@/components/floating-cta"
 import { HeroSection } from "@/components/sections/hero-section"
-import { WebinarBenefitsSection } from "@/components/sections/webinar-benefits-section"
-import { WhyDubaiSection } from "@/components/sections/why-dubai-section"
-import { WebinarInfoSection } from "@/components/sections/webinar-info-section"
+import { BenefitsSection } from "@/components/sections/benefits-section"
+import { BusinessTypesSection } from "@/components/sections/business-types-section"
+import { SetupProcessSection } from "@/components/sections/setup-process-section"
 import { TestimonialsSection } from "@/components/sections/testimonials-section"
 import { FAQSection } from "@/components/sections/faq-section"
 import { FinalCTASection } from "@/components/sections/final-cta-section"
-import { NotForEveryoneSection } from "@/components/sections/not-for-everyone-section"
-import { ForWhomSection } from "@/components/sections/for-whom-section"
-import { WebinarPopupForm } from "@/components/webinar-popup-form"
-import { PropertyGallerySection } from "@/components/sections/property-gallery-section"
-import { DubaiAttractionsSection } from "@/components/sections/dubai-attractions-section"
-import { PropertyValueSection } from "@/components/sections/property-value-section"
-import { InvestmentProcessSection } from "@/components/sections/investment-process-section"
+import { ConsultationPopupForm } from "@/components/consultation-popup-form"
 import { SocialProofBar } from "@/components/social-proof-bar"
-import { DubaiLuxuryGallery } from "@/components/sections/dubai-luxury-gallery"
-import { useIsMobile } from "@/hooks/use-mobile"
+import { TaxCalculatorSection } from "@/components/sections/tax-calculator-section"
+import { ServicePackagesSection } from "@/components/sections/service-packages-section"
+import { TeamSection } from "@/components/sections/team-section"
 
 export default function LandingPage() {
-  const webinarDate = "May 15, 2025 19:00:00"
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const isMobile = useIsMobile()
 
   // Function to open the form popup
   const openForm = () => {
@@ -47,11 +39,8 @@ export default function LandingPage() {
     openForm()
   }
 
-  // Add scroll animation with performance optimization
+  // Add scroll animation
   useEffect(() => {
-    // Skip animations on mobile for better performance
-    if (isMobile) return
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -62,7 +51,6 @@ export default function LandingPage() {
       },
       {
         threshold: 0.1,
-        rootMargin: "0px 0px 50px 0px",
       },
     )
 
@@ -72,38 +60,23 @@ export default function LandingPage() {
     return () => {
       revealElements.forEach((el) => observer.unobserve(el))
     }
-  }, [isMobile])
+  }, [])
 
   return (
     <div className="flex min-h-screen flex-col bg-cream text-navy">
       <Header onCtaClick={handleCtaClick} />
 
-      {/* Countdown Timer Bar */}
-      <div className="bg-gold/5 py-4 border-b border-gold/10">
-        <div className="container">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-            <div className="text-center md:text-right">
-              <span className="text-navy font-medium">Do najbliższego webinaru pozostało:</span>
-            </div>
-            <CountdownTimer targetDate={webinarDate} />
-          </div>
-        </div>
-      </div>
+      <SocialProofBar />
 
       <main className="flex-1">
         <HeroSection onCtaClick={handleCtaClick} />
-        <SocialProofBar />
-        <PropertyGallerySection />
-        <WebinarBenefitsSection onCtaClick={handleCtaClick} />
-        <WhyDubaiSection />
-        <PropertyValueSection />
-        <DubaiLuxuryGallery />
-        <DubaiAttractionsSection />
-        <InvestmentProcessSection />
-        <WebinarInfoSection onCtaClick={handleCtaClick} />
-        <ForWhomSection />
-        <NotForEveryoneSection />
+        <BenefitsSection />
+        <TaxCalculatorSection onCtaClick={handleCtaClick} />
         <TestimonialsSection />
+        <ServicePackagesSection onCtaClick={handleCtaClick} />
+        <BusinessTypesSection />
+        <TeamSection />
+        <SetupProcessSection />
         <FAQSection />
         <FinalCTASection onCtaClick={handleCtaClick} />
       </main>
@@ -114,7 +87,7 @@ export default function LandingPage() {
       <FloatingCTA onClick={handleCtaClick} />
 
       {/* Popup Form */}
-      <WebinarPopupForm isOpen={isFormOpen} onClose={closeForm} />
+      <ConsultationPopupForm isOpen={isFormOpen} onClose={closeForm} />
     </div>
   )
 }

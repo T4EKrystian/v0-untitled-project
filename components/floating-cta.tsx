@@ -35,7 +35,7 @@ export function FloatingCTA({ onClick }: FloatingCTAProps) {
         className="w-full md:w-auto px-6 py-5 md:px-8 md:py-6 rounded-md shadow-gold-lg group text-base"
         onClick={onClick}
       >
-        <span>Zapisz się na webinar</span>
+        <span>Załóż firmę bez wychodzenia z domu</span>
         <ArrowRight className="ml-2 h-5 w-5 transition-all duration-300 group-hover:translate-x-1" />
       </Button>
     </div>

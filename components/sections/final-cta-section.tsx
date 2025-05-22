@@ -3,7 +3,6 @@
 import type React from "react"
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { LimitedSpotsCounter } from "@/components/limited-spots-counter"
 
 interface FinalCTASectionProps {
   onCtaClick?: (e: React.MouseEvent) => void
@@ -53,43 +52,44 @@ export function FinalCTASection({ onCtaClick }: FinalCTASectionProps) {
         <div className="max-w-3xl mx-auto text-center">
           <div className="elegant-badge text-gold-600 inline-block mb-3 sm:mb-4 reveal">
             <span className="designer-dot"></span>
-            Nie przegap okazji
+            Rozpocznij już dziś
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl mb-4 sm:mb-5 reveal-left">
             {Math.random() > 0.5
-              ? "Ceny rosną. Popyt rośnie. Inwestorzy działają – a Ty nadal się zastanawiasz?"
-              : "Zabezpiecz miejsce na webinarze i zobacz, jak zacząć od 600 000 zł lub mniej – bez pośredników i bez podatków"}
+              ? "Czas na globalny biznes bez podatków. Dubaj czeka na Ciebie."
+              : "Uwolnij swój biznes od podatków i biurokracji. Załóż firmę w Dubaju."}
           </h2>
           <p
             className="text-gray-500 text-base sm:text-lg mb-3 sm:mb-4 reveal-right luxury-text"
             style={{ transitionDelay: "0.2s" }}
           >
-            Kupno mieszkania w Dubaju to nie tylko sposób na dochód pasywny – to też zabezpieczenie kapitału, styl życia
-            i dostęp do rynku, który rozwija się szybciej niż jakikolwiek w Europie. Zapisz się i zobacz, co możesz
-            zyskać – niezależnie, czy szukasz ROI, czy nowego miejsca do życia.
+            Założenie firmy w Dubaju to nie tylko sposób na optymalizację podatkową – to również dostęp do globalnych
+            rynków, prestiż międzynarodowej marki i możliwość prowadzenia biznesu w jednym z najbardziej dynamicznych
+            centrów gospodarczych świata.
           </p>
           <p
             className="text-gray-500 text-base sm:text-lg mb-6 sm:mb-8 reveal-right luxury-text"
             style={{ transitionDelay: "0.3s" }}
           >
-            Myślisz o przeprowadzce? Dubaj to realna alternatywa: bezpiecznie, nowocześnie i z nieruchomościami, które
-            same pracują na Twoją przyszłość.
+            Nasz zespół ekspertów przeprowadzi Cię przez cały proces – od wyboru odpowiedniej struktury biznesowej,
+            przez rejestrację firmy, aż po otwarcie konta bankowego i uzyskanie wiz rezydencyjnych.
           </p>
           <div
-            className="grid gap-3 sm:gap-4 sm:grid-cols-2 max-w-lg mx-auto mb-6 sm:mb-8 reveal"
+            className="grid gap-3 sm:gap-4 sm:grid-cols-3 max-w-lg mx-auto mb-6 sm:mb-8 reveal"
             style={{ transitionDelay: "0.4s" }}
           >
             <div className="bg-gradient-to-br from-navy-800/90 to-navy-900 border-gold/30 border-0 rounded-md p-4 sm:p-5 text-center refined-shadow card-stack hover-lift">
-              <div className="text-gold-300 text-2xl sm:text-3xl luxury-heading luxury-number">15</div>
-              <div className="text-gray-300/80">maja 2025</div>
+              <div className="text-gold-300 text-2xl sm:text-3xl luxury-heading luxury-number">0%</div>
+              <div className="text-gray-300/80">podatku dochodowego</div>
             </div>
             <div className="bg-gradient-to-br from-navy-800/90 to-navy-900 border-gold/30 border-0 rounded-md p-4 sm:p-5 text-center refined-shadow card-stack hover-lift">
-              <div className="text-gold-300 text-2xl sm:text-3xl luxury-heading luxury-number">19:00</div>
-              <div className="text-gray-300/80">czasu polskiego</div>
+              <div className="text-gold-300 text-2xl sm:text-3xl luxury-heading luxury-number">100%</div>
+              <div className="text-gray-300/80">własności firmy</div>
             </div>
-          </div>
-          <div className="max-w-md mx-auto mb-6 reveal" style={{ transitionDelay: "0.4s" }}>
-            <LimitedSpotsCounter totalSpots={50} takenSpots={42} />
+            <div className="bg-gradient-to-br from-navy-800/90 to-navy-900 border-gold/30 border-0 rounded-md p-4 sm:p-5 text-center refined-shadow card-stack hover-lift">
+              <div className="text-gold-300 text-2xl sm:text-3xl luxury-heading luxury-number">5 dni</div>
+              <div className="text-gray-300/80">do rejestracji</div>
+            </div>
           </div>
           <Button
             variant="modern"
@@ -98,10 +98,10 @@ export function FinalCTASection({ onCtaClick }: FinalCTASectionProps) {
             className="px-8 sm:px-10 py-4 sm:py-5 text-base sm:text-lg refined-button shimmer reveal bg-gradient-to-br from-gold-600 to-gold-800 text-white border-gold/30 hover:from-gold-500 hover:to-gold-700"
             style={{ transitionDelay: "0.5s" }}
           >
-            Zapisuję się
+            Dowiedz się, jak NIE płacić podatków
           </Button>
           <p className="text-gray-500 mt-4 reveal" style={{ transitionDelay: "0.6s" }}>
-            Po zapisaniu się otrzymasz potwierdzenie oraz link do webinaru na podany adres email.
+            Odpowiemy w ciągu 24 godzin. Bez zobowiązań i ukrytych kosztów.
           </p>
         </div>
       </div>

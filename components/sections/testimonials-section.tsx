@@ -8,28 +8,28 @@ export function TestimonialsSection() {
   const testimonials = [
     {
       name: "Anna Kowalska",
-      role: "Inwestor",
+      role: "CEO, Tech Solutions",
       content:
-        "Dzięki wiedzy zdobytej na webinarze, zainwestowałam w apartament w Palm Jumeirah. Proces przebiegł sprawnie i bez stresu. Polecam!",
+        "Dzięki profesjonalnemu wsparciu zespołu, proces założenia firmy w Dubaju przebiegł sprawnie i bez stresu. Teraz moja firma działa globalnie, a ja korzystam z wszystkich przywilejów podatkowych.",
       isHighlighted: false,
     },
     {
       name: "Jan Nowak",
-      role: "Przedsiębiorca",
+      role: "Właściciel e-commerce",
       content:
-        "Zainwestowałem w dwie nieruchomości w Dubai Marina. Stopa zwrotu przekroczyła moje oczekiwania. Świetna obsługa i doradztwo.",
+        "Otworzyłem firmę w strefie wolnocłowej w Dubaju. Proces był szybki i przejrzysty. Teraz mój biznes rozwija się międzynarodowo, a ja płacę 0% podatku dochodowego.",
       isHighlighted: false,
     },
     {
       name: "Karol",
-      role: "36 lat, Poznań",
+      role: "36 lat, Warszawa",
       content:
-        "Dzięki wsparciu Adama Nowaka zainwestowałem z myślą o pasywnym dochodzie. Cały proces zdalny. Po 2 miesiącach miałem najemcę i 9% ROI netto. Polecam każdemu, kto szuka konkretu.",
+        "Zdecydowałem się na firmę offshore w Dubaju dla mojego biznesu consultingowego. Cały proces zajął tylko 5 dni. Teraz mogę legalnie optymalizować podatki i działać globalnie.",
       isHighlighted: true,
       metrics: {
-        roi: "9,1%",
-        timeToRent: "2 miesiące",
-        location: "Business Bay",
+        roi: "5 dni",
+        timeToRent: "0% podatku",
+        location: "Free Zone",
       },
     },
   ]
@@ -73,13 +73,13 @@ export function TestimonialsSection() {
 
       <div className="container relative z-10">
         <SectionTitle
-          badge="Opinie uczestników"
+          badge="Opinie klientów"
           title={
             <span>
-              Co <span className="gradient-text">mówią</span> nasi inwestorzy
+              Co <span className="gradient-text">mówią</span> nasi klienci
             </span>
           }
-          description="Poznaj opinie osób, które zaufały naszemu doświadczeniu i zainwestowały w Dubaju"
+          description="Poznaj opinie przedsiębiorców, którzy skorzystali z naszych usług i prowadzą teraz biznes w Dubaju"
         />
 
         <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">

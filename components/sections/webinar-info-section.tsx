@@ -101,18 +101,12 @@ export function WebinarInfoSection({ onCtaClick }: WebinarInfoSectionProps) {
 
             <div className="pt-2 sm:pt-3">
               <div className="flex items-center gap-4 mb-4 bg-gold-50 p-3 sm:p-4 rounded-md">
-                <div className="relative h-12 w-12 rounded-full overflow-hidden shadow-sm">
-                  <Image
-                    src="/images/real-estate-expert.jpeg"
-                    alt="Adam Nowak - ekspert rynku nieruchomości w Dubaju"
-                    fill
-                    className="object-cover"
-                    sizes="48px"
-                  />
+                <div className="h-12 w-12 rounded-md bg-white flex items-center justify-center shadow-sm">
+                  <span className="text-gold-500 font-light">MK</span>
                 </div>
                 <div>
-                  <p className="font-medium text-lg">Adam Nowak</p>
-                  <p className="text-navy-600">Dyrektor ds. Inwestycji Międzynarodowych z 10-letnim doświadczeniem</p>
+                  <p className="font-light text-lg">Marek Kowalski</p>
+                  <p className="text-navy-600">Zainwestował w 3 nieruchomości w Dubaju. ROI: 9,1% rocznie.</p>
                 </div>
               </div>
               <Button variant="modern" size="lg" onClick={onCtaClick} className="w-full refined-button">

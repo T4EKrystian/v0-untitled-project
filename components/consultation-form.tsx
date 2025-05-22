@@ -2,31 +2,32 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { LimitedSpotsCounter } from "./limited-spots-counter"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 
-interface WebinarFormProps {
+interface ConsultationFormProps {
   formStyle?: "light" | "dark"
   simplified?: boolean
 }
 
-export function WebinarForm({ formStyle = "light", simplified = false }: WebinarFormProps) {
+export function ConsultationForm({ formStyle = "light", simplified = false }: ConsultationFormProps) {
   return (
     <Card
-      className={`relative ${formStyle === "dark" ? "bg-gradient-to-b from-navy-800/90 to-navy-900 border-gold/30" : "bg-white border-gold/10"} backdrop-blur-md shadow-gold`}
+      className={`relative ${formStyle === "dark" ? "bg-gradient-to-b from-navy-800 to-navy-900 border-gold/30" : "bg-white border-gold/10"} shadow-gold`}
     >
       {!simplified && (
         <CardHeader className="pb-2 px-4 md:px-6">
           <div className="modern-badge inline-block mb-2 text-xs md:text-sm">
             <span className="designer-dot"></span>
-            Najbliższy webinar: 15 maja 2025
+            Bezpłatna konsultacja
           </div>
           <CardTitle
             className={`text-lg md:text-xl luxury-heading ${formStyle === "dark" ? "text-white" : "text-navy"}`}
           >
-            <span className="gradient-text-premium">Zapisz się teraz</span> – liczba miejsc ograniczona
+            <span className="gradient-text-premium">Skontaktuj się z nami</span> – odpowiemy w 24h
           </CardTitle>
           <CardDescription className={`text-sm ${formStyle === "dark" ? "text-gray-300/80" : "text-gray-500"}`}>
-            Dowiedz się, jak inwestować w nieruchomości w Dubaju bez wychodzenia z domu
+            Dowiedz się, jak możemy pomóc Ci założyć i rozwinąć Twój biznes w Dubaju
           </CardDescription>
         </CardHeader>
       )}
@@ -53,16 +54,39 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
                 className={`premium-input h-10 md:h-11 text-base ${formStyle === "dark" ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-400" : "bg-white text-navy border-gold/10 placeholder-gray-500"} hover:border-gold/40 focus:border-gold/50 transition-colors`}
               />
             </div>
+            {!simplified && (
+              <>
+                <div>
+                  <Select>
+                    <SelectTrigger
+                      className={`premium-input h-10 md:h-11 text-base ${formStyle === "dark" ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-400" : "bg-white text-navy border-gold/10 placeholder-gray-500"} hover:border-gold/40 focus:border-gold/50 transition-colors`}
+                    >
+                      <SelectValue placeholder="Rodzaj działalności" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="freezone">Strefa wolnocłowa (Free Zone)</SelectItem>
+                      <SelectItem value="mainland">Rynek lokalny (Mainland)</SelectItem>
+                      <SelectItem value="offshore">Firma offshore</SelectItem>
+                      <SelectItem value="unsure">Nie jestem pewien/pewna</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Textarea
+                    placeholder="Twoje pytanie lub komentarz"
+                    className={`premium-input min-h-[100px] text-base ${formStyle === "dark" ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-400" : "bg-white text-navy border-gold/10 placeholder-gray-500"} hover:border-gold/40 focus:border-gold/50 transition-colors`}
+                  />
+                </div>
+              </>
+            )}
           </div>
-
-          {!simplified && <LimitedSpotsCounter totalSpots={50} takenSpots={42} className="mt-2" />}
 
           <Button
             variant="modern"
             size={simplified ? "lg" : "xl"}
             className={`w-full mt-2 group bg-gradient-to-br from-gold-600 to-gold-800 text-white border-gold/30 hover:from-gold-500 hover:to-gold-700 text-base py-5 ${simplified ? "" : ""}`}
           >
-            <span>{simplified ? "Zapisz się" : "Zarezerwuj miejsce teraz"}</span>
+            <span>{simplified ? "Wyślij zapytanie" : "Umów bezpłatną konsultację"}</span>
           </Button>
 
           {!simplified && (

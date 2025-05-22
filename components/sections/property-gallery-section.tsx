@@ -4,99 +4,380 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { SectionTitle } from "@/components/ui/section-title"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
-import { useIsMobile } from "@/hooks/use-mobile"
 
 export function PropertyGallerySection() {
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxImage, setLightboxImage] = useState("")
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const isMobile = useIsMobile()
 
-  // Ograniczamy liczbę nieruchomości na mobile dla lepszej wydajności
   const properties = [
     {
       id: 1,
-      title: "Ellington House",
+      title: "Luksusowy Apartament w Dubai Marina",
+      price: "2,500,000 AED",
       location: "Dubai Marina",
-      image: "/images/ellington-house.jpeg",
+      bedrooms: 2,
+      bathrooms: 2,
+      size: "120 m²",
+      description: "Nowoczesny apartament z widokiem na marinę, w pełni umeblowany, z dostępem do basenu i siłowni.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "8.2%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
     },
     {
       id: 2,
-      title: "Rosemont Residences",
+      title: "Penthouse w Downtown Dubai",
+      price: "7,800,000 AED",
       location: "Downtown Dubai",
-      image: "/images/rosemont-residences.jpeg",
+      bedrooms: 4,
+      bathrooms: 5,
+      size: "350 m²",
+      description: "Ekskluzywny penthouse z widokiem na Burj Khalifa, prywatny taras, luksusowe wykończenie.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "7.5%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
     },
     {
       id: 3,
-      title: "Ellington Views",
+      title: "Willa na Palm Jumeirah",
+      price: "15,000,000 AED",
       location: "Palm Jumeirah",
-      image: "/images/ellington-views.jpeg",
+      bedrooms: 5,
+      bathrooms: 6,
+      size: "600 m²",
+      description: "Luksusowa willa z prywatną plażą, basenem i widokiem na zatokę. Najwyższy standard wykończenia.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "6.8%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
     },
     {
       id: 4,
-      title: "Luxury Townhouses",
-      location: "Dubai Hills Estate",
-      image: "/images/luxury-townhouses.jpeg",
+      title: "Apartament w Business Bay",
+      price: "1,800,000 AED",
+      location: "Business Bay",
+      bedrooms: 1,
+      bathrooms: 2,
+      size: "85 m²",
+      description: "Nowoczesny apartament inwestycyjny z wysokim ROI, blisko Dubai Mall i centrum biznesowego.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "9.1%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
     },
     {
       id: 5,
-      title: "Art Bay",
-      location: "Business Bay",
-      image: "/images/art-bay.jpeg",
+      title: "Townhouse w Dubai Hills",
+      price: "4,200,000 AED",
+      location: "Dubai Hills Estate",
+      bedrooms: 3,
+      bathrooms: 4,
+      size: "220 m²",
+      description: "Elegancki szeregowiec w prestiżowej dzielnicy z dostępem do pola golfowego i parków.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "7.2%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
     },
     {
       id: 6,
-      title: "Costa Mare",
+      title: "Apartament z widokiem na morze",
+      price: "3,100,000 AED",
       location: "Jumeirah Beach Residence",
-      image: "/images/costa-mare.jpeg",
+      bedrooms: 3,
+      bathrooms: 3,
+      size: "180 m²",
+      description: "Przestronny apartament z bezpośrednim widokiem na morze, dostępem do prywatnej plaży i udogodnień.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "8.0%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
     },
-    // Pozostałe nieruchomości pokazujemy tylko na desktopie
-    ...(isMobile
-      ? []
-      : [
-          {
-            id: 7,
-            title: "Claydon House",
-            location: "Dubai Sports City",
-            image: "/images/claydon-house.jpeg",
-          },
-          {
-            id: 8,
-            title: "Belgravia Gardens",
-            location: "Jumeirah Village Circle",
-            image: "/images/belgravia-gardens.jpeg",
-          },
-          {
-            id: 9,
-            title: "Belgravia Square",
-            location: "Dubai International Financial Centre",
-            image: "/images/belgravia-square-pool.jpeg",
-          },
-          {
-            id: 10,
-            title: "Arbor View",
-            location: "Dubai Creek Harbour",
-            image: "/images/arbor-view-exterior.jpeg",
-          },
-          {
-            id: 11,
-            title: "Arbor Residences",
-            location: "Emirates Hills",
-            image: "/images/arbor-view-caravan.jpeg",
-          },
-          {
-            id: 12,
-            title: "Palm Terraces",
-            location: "Palm Jumeirah",
-            image: "/images/costa-mare.jpeg",
-          },
-        ]),
+    {
+      id: 7,
+      title: "Studio w Dubai Sports City",
+      price: "550,000 AED",
+      location: "Dubai Sports City",
+      bedrooms: 0,
+      bathrooms: 1,
+      size: "45 m²",
+      description: "Kompaktowe studio idealne na start lub jako inwestycja z wysokim zwrotem z najmu.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "9.5%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 8,
+      title: "Apartament w Jumeirah Village Circle",
+      price: "1,200,000 AED",
+      location: "Jumeirah Village Circle",
+      bedrooms: 2,
+      bathrooms: 2,
+      size: "110 m²",
+      description: "Nowoczesny apartament w spokojnej okolicy z dostępem do basenu i siłowni.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "8.7%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 9,
+      title: "Luksusowy Apartament w DIFC",
+      price: "5,500,000 AED",
+      location: "Dubai International Financial Centre",
+      bedrooms: 3,
+      bathrooms: 4,
+      size: "210 m²",
+      description: "Prestiżowy apartament w sercu dzielnicy finansowej z panoramicznym widokiem na miasto.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "7.0%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 10,
+      title: "Apartament w Dubai Creek Harbour",
+      price: "2,800,000 AED",
+      location: "Dubai Creek Harbour",
+      bedrooms: 2,
+      bathrooms: 3,
+      size: "140 m²",
+      description: "Nowoczesny apartament z widokiem na zatokę w nowej, prestiżowej dzielnicy Dubaju.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "7.8%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 11,
+      title: "Willa w Emirates Hills",
+      price: "25,000,000 AED",
+      location: "Emirates Hills",
+      bedrooms: 6,
+      bathrooms: 7,
+      size: "950 m²",
+      description: "Ekskluzywna willa w najbardziej prestiżowej dzielnicy Dubaju z prywatnym ogrodem i basenem.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "5.5%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 12,
+      title: "Apartament w Bluewaters Island",
+      price: "3,900,000 AED",
+      location: "Bluewaters Island",
+      bedrooms: 2,
+      bathrooms: 3,
+      size: "160 m²",
+      description: "Luksusowy apartament na sztucznej wyspie z widokiem na Dubai Eye i Zatokę Perską.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "7.3%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 13,
+      title: "Penthouse w Dubai Marina",
+      price: "12,000,000 AED",
+      location: "Dubai Marina",
+      bedrooms: 4,
+      bathrooms: 5,
+      size: "400 m²",
+      description:
+        "Spektakularny penthouse z prywatnym tarasem i jacuzzi na dachu oraz panoramicznym widokiem na marinę.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "6.5%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 14,
+      title: "Apartament w City Walk",
+      price: "4,500,000 AED",
+      location: "City Walk",
+      bedrooms: 3,
+      bathrooms: 3,
+      size: "190 m²",
+      description: "Nowoczesny apartament w modnej dzielnicy z licznymi restauracjami i sklepami w zasięgu spaceru.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "7.1%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 15,
+      title: "Apartament w The Palm Tower",
+      price: "3,200,000 AED",
+      location: "Palm Jumeirah",
+      bedrooms: 1,
+      bathrooms: 2,
+      size: "105 m²",
+      description:
+        "Luksusowy apartament w ikonicznym wieżowcu z dostępem do basenu na dachu i widokiem na całe miasto.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "7.9%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 16,
+      title: "Townhouse w Arabian Ranches",
+      price: "3,800,000 AED",
+      location: "Arabian Ranches",
+      bedrooms: 4,
+      bathrooms: 4,
+      size: "280 m²",
+      description:
+        "Przestronny dom szeregowy w spokojnej okolicy z dostępem do pola golfowego i terenów rekreacyjnych.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "6.8%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 17,
+      title: "Apartament w Damac Hills",
+      price: "1,600,000 AED",
+      location: "Damac Hills",
+      bedrooms: 2,
+      bathrooms: 2,
+      size: "115 m²",
+      description: "Elegancki apartament z widokiem na pole golfowe w prestiżowej dzielnicy mieszkalnej.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "8.3%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 18,
+      title: "Apartament w Meydan",
+      price: "2,100,000 AED",
+      location: "Meydan",
+      bedrooms: 2,
+      bathrooms: 3,
+      size: "130 m²",
+      description: "Nowoczesny apartament z widokiem na tor wyścigowy i panoramę miasta.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "7.7%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 19,
+      title: "Apartament w Dubai South",
+      price: "900,000 AED",
+      location: "Dubai South",
+      bedrooms: 1,
+      bathrooms: 1,
+      size: "75 m²",
+      description: "Przystępny cenowo apartament w rozwijającej się dzielnicy blisko nowego lotniska i Expo City.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "9.0%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
+    {
+      id: 20,
+      title: "Luksusowy Apartament w Jumeirah Lake Towers",
+      price: "2,300,000 AED",
+      location: "Jumeirah Lake Towers",
+      bedrooms: 3,
+      bathrooms: 3,
+      size: "165 m²",
+      description: "Przestronny apartament z widokiem na jeziora i Dubai Marina w popularnej dzielnicy biznesowej.",
+      image: "/placeholder.svg?height=600&width=800",
+      roi: "7.6%",
+      gallery: [
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+        "/placeholder.svg?height=800&width=1200",
+      ],
+    },
   ]
 
-  // Add scroll animation - tylko na desktopie dla lepszej wydajności
+  // Add scroll animation
   useEffect(() => {
-    if (isMobile) return
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -116,12 +397,13 @@ export function PropertyGallerySection() {
     return () => {
       revealElements.forEach((el) => observer.unobserve(el))
     }
-  }, [isMobile])
+  }, [])
 
-  const openLightbox = (index) => {
-    if (isMobile) return // Na mobile nie otwieramy lightboxa
-    setLightboxImage(properties[index].image)
-    setCurrentImageIndex(index)
+  const openLightbox = (propertyIndex, imageIndex = 0) => {
+    const property = properties[propertyIndex]
+    const imageSrc = imageIndex === 0 ? property.image : property.gallery[imageIndex - 1]
+    setLightboxImage(imageSrc)
+    setCurrentImageIndex(propertyIndex)
     setLightboxOpen(true)
     document.body.style.overflow = "hidden"
   }
@@ -132,72 +414,111 @@ export function PropertyGallerySection() {
   }
 
   const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % properties.length)
-    setLightboxImage(properties[(currentImageIndex + 1) % properties.length].image)
+    const property = properties[currentImageIndex]
+    const totalImages = property.gallery.length + 1 // Main image + gallery images
+    let currentIndex = property.gallery.indexOf(lightboxImage) + 1
+    if (lightboxImage === property.image) currentIndex = 0
+
+    currentIndex = (currentIndex + 1) % totalImages
+    setLightboxImage(currentIndex === 0 ? property.image : property.gallery[currentIndex - 1])
   }
 
   const prevImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + properties.length) % properties.length)
-    setLightboxImage(properties[(currentImageIndex - 1 + properties.length) % properties.length].image)
+    const property = properties[currentImageIndex]
+    const totalImages = property.gallery.length + 1 // Main image + gallery images
+    let currentIndex = property.gallery.indexOf(lightboxImage) + 1
+    if (lightboxImage === property.image) currentIndex = 0
+
+    currentIndex = (currentIndex - 1 + totalImages) % totalImages
+    setLightboxImage(currentIndex === 0 ? property.image : property.gallery[currentIndex - 1])
   }
 
   return (
     <section id="properties" className="py-8 sm:py-12 md:py-16 section-dark modern-section relative overflow-hidden">
-      {/* Designer decorative elements - ukryte na mobile dla lepszej wydajności */}
-      {!isMobile && (
-        <>
-          <div className="designer-circle w-96 h-96 opacity-10 top-[10%] right-[10%]"></div>
-          <div className="designer-circle w-80 h-80 opacity-10 bottom-[20%] left-[5%]"></div>
-          <div className="designer-square w-60 h-60 opacity-10 top-[40%] left-[10%] rotate-12"></div>
-          <div className="blurred-dots top-40 right-[15%]"></div>
-          <div className="blurred-dots bottom-40 left-[20%]"></div>
-          <div className="geometric-shape geometric-square w-72 h-72 -top-36 -right-36 rotate-12"></div>
-          <div className="geometric-shape geometric-circle w-96 h-96 -bottom-48 -left-48"></div>
-          <div className="absolute inset-0 subtle-grid opacity-30"></div>
-        </>
-      )}
+      {/* Designer decorative elements */}
+      <div className="designer-circle w-96 h-96 opacity-10 top-[10%] right-[10%]"></div>
+      <div className="designer-circle w-80 h-80 opacity-10 bottom-[20%] left-[5%]"></div>
+      <div className="designer-square w-60 h-60 opacity-10 top-[40%] left-[10%] rotate-12"></div>
+
+      {/* Abstract blurred elements */}
+      <div className="blurred-dots top-40 right-[15%]"></div>
+      <div className="blurred-dots bottom-40 left-[20%]"></div>
+
+      {/* Geometric shapes */}
+      <div className="geometric-shape geometric-square w-72 h-72 -top-36 -right-36 rotate-12"></div>
+      <div className="geometric-shape geometric-circle w-96 h-96 -bottom-48 -left-48"></div>
+      <div className="absolute inset-0 subtle-grid opacity-30"></div>
 
       <div className="container relative z-10">
         <SectionTitle
-          badge="Ekskluzywne inwestycje"
+          badge="Ekskluzywne oferty"
           title={
             <span>
-              Odkryj <span className="gradient-text-premium">luksusowe</span> inwestycje w Dubaju
+              Odkryj <span className="gradient-text-premium">luksusowe</span> nieruchomości w Dubaju
             </span>
           }
-          description="Przejrzyj nasze wyselekcjonowane oferty inwestycyjne premium w najbardziej pożądanych lokalizacjach"
+          description="Przejrzyj nasze wyselekcjonowane oferty nieruchomości premium w najbardziej pożądanych lokalizacjach"
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mt-6 sm:mt-8">
-          {properties.map((property, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mt-6 sm:mt-8">
+          {properties.slice(0, 5).map((property, index) => (
             <div
               key={property.id}
-              className={`group relative h-[240px] sm:h-[280px] rounded-xl overflow-hidden shadow-gold luxury-frame reveal ${
-                !isMobile ? "hover-lift cursor-pointer" : ""
-              }`}
-              style={{ animationDelay: `${index * 0.05}s` }}
-              onClick={isMobile ? undefined : () => openLightbox(index)}
+              className={`group relative h-[240px] sm:h-[280px] rounded-xl overflow-hidden shadow-gold hover-lift luxury-frame reveal ${index === 0 ? "md:col-span-2" : ""}`}
+              style={{ animationDelay: `${property.id * 0.05}s` }}
+              onClick={() => openLightbox(index)}
             >
               <div className="absolute inset-0 w-full h-full">
                 <Image
                   src={property.image || "/placeholder.svg"}
                   alt={property.title}
                   fill
-                  className={`object-cover ${!isMobile ? "transition-transform duration-500 group-hover:scale-110" : ""}`}
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  loading={index < 3 ? "eager" : "lazy"}
                 />
               </div>
 
+              <div className="absolute top-4 left-4 bg-gold/90 text-white px-3 py-1 rounded-md text-sm font-medium z-10">
+                ROI: {property.roi}
+              </div>
+
+              <div className="absolute top-4 right-4 bg-white/90 text-navy px-3 py-1 rounded-md text-sm font-medium z-10 flex items-center gap-1">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M2 9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V9z" />
+                  <path d="m1 9 9 6 9-6" />
+                </svg>
+                <span>{property.gallery.length + 1} zdjęć</span>
+              </div>
+
               {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/50 via-navy-800/30 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-800/60 to-transparent"></div>
 
               {/* Content at the bottom */}
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
                 <h3 className="text-xl font-bold mb-2 drop-shadow-md">{property.title}</h3>
+                <p className="text-gold-200 text-lg font-semibold mb-3 drop-shadow-md">{property.price}</p>
                 <div className="flex flex-wrap gap-2 text-sm">
                   <div className="bg-gold/20 backdrop-blur-sm px-2 py-1 rounded">
                     <span className="font-medium">{property.location}</span>
+                  </div>
+                  <div className="bg-gold/20 backdrop-blur-sm px-2 py-1 rounded">
+                    <span className="font-medium">{property.bedrooms} sypialnie</span>
+                  </div>
+                  <div className="bg-gold/20 backdrop-blur-sm px-2 py-1 rounded">
+                    <span className="font-medium">{property.bathrooms} łazienki</span>
+                  </div>
+                  <div className="bg-gold/20 backdrop-blur-sm px-2 py-1 rounded">
+                    <span className="font-medium">{property.size}</span>
                   </div>
                 </div>
               </div>
@@ -228,7 +549,7 @@ export function PropertyGallerySection() {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-white mb-3 text-center luxury-heading">
-                Najwyższe ROI na rynku inwestycyjnym
+                Najwyższe ROI na rynku
               </h3>
               <div className="h-px w-16 bg-gold/20 mx-auto mb-4"></div>
               <p className="text-gray-300/80 text-center">
@@ -314,8 +635,8 @@ export function PropertyGallerySection() {
         </div>
       </div>
 
-      {/* Lightbox - tylko dla wersji desktopowej */}
-      {!isMobile && lightboxOpen && (
+      {/* Lightbox */}
+      {lightboxOpen && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
           <button
             onClick={closeLightbox}
@@ -336,7 +657,6 @@ export function PropertyGallerySection() {
               fill
               className="object-contain"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-              priority
             />
           </div>
         </div>

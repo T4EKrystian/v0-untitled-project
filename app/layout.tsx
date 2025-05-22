@@ -18,8 +18,9 @@ const spaceMono = Space_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Dubai Invest - Ekskluzywne nieruchomości w Dubaju",
-  description: "Zainwestuj w nieruchomości w Dubaju. Wysokie ROI, brak podatków, pełna własność.",
+  title: "Dubai Business - Założ firmę w Dubaju bez podatków",
+  description:
+    "Kompleksowe wsparcie w zakładaniu i prowadzeniu firmy w Dubaju. 0% podatku dochodowego, 100% własności dla obcokrajowców, szybki proces rejestracji.",
     generator: 'v0.dev'
 }
 
