@@ -1,46 +1,59 @@
 /**
- * Obsługuje żądania POST z formularza webinarowego
- * Ten kod należy wkleić do edytora Google Apps Script w arkuszu Google Sheets
+ * Google Apps Script do obsługi formularza webinarowego
+ * Zapisuje dane z formularza do arkusza Google Sheets
  */
+
+// Funkcja doPost obsługuje żądania POST z formularza
 function doPost(e) {
   try {
-    // Obsługa CORS
-    const headers = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Content-Type": "application/json",
-    }
-
-    // Parsowanie danych przychodzących
+    // Pobierz dane z żądania
     const data = JSON.parse(e.postData.contents)
 
-    // Otwieranie aktywnego arkusza
+    // Logowanie dla debugowania
+    console.log("Otrzymane dane:", data)
+    console.log("Źródło żądania:", e.origin || "brak informacji o pochodzeniu")
+
+    // Otwórz arkusz
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet()
 
-    // Sprawdzenie, czy arkusz ma nagłówki, jeśli nie - dodaj je
+    // Sprawdź, czy arkusz ma nagłówki, jeśli nie - dodaj je
     if (sheet.getLastRow() === 0) {
-      sheet.appendRow(["Imię i nazwisko", "Email", "Telefon", "Data zgłoszenia"])
+      sheet.appendRow(["Imię i nazwisko", "Email", "Telefon", "Data zgłoszenia", "Źródło", "User Agent"])
     }
 
     // Formatowanie daty
     let formattedDate
     try {
-      const timestamp = new Date(data.timestamp)
+      const timestamp = new Date(data.timestamp || new Date().toISOString())
       formattedDate = Utilities.formatDate(timestamp, "Europe/Warsaw", "dd.MM.yyyy HH:mm:ss")
     } catch (e) {
-      // Jeśli formatowanie się nie powiedzie, użyj aktualnej daty
       formattedDate = Utilities.formatDate(new Date(), "Europe/Warsaw", "dd.MM.yyyy HH:mm:ss")
     }
 
     // Dodawanie nowego wiersza z danymi
-    sheet.appendRow([data.name || "", data.email || "", data.phone || "", formattedDate])
+    sheet.appendRow([
+      data.name || "",
+      data.email || "",
+      data.phone || "",
+      formattedDate,
+      data.source || e.origin || "nieznane",
+      e.userAgent || "nieznany",
+    ])
 
-    // Zwracanie odpowiedzi sukcesu
+    // Skonfiguruj nagłówki CORS - zezwalaj na wszystkie domeny
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Content-Type": "application/json",
+    }
+
+    // Zwróć sukces
     return ContentService.createTextOutput(
       JSON.stringify({
         success: true,
         message: "Dane zostały zapisane",
+        timestamp: new Date().toISOString(),
       }),
     )
       .setMimeType(ContentService.MimeType.JSON)
@@ -49,36 +62,46 @@ function doPost(e) {
     // Logowanie błędu
     console.error("Błąd w Google Apps Script:", error)
 
-    // Zwracanie odpowiedzi błędu
+    // Skonfiguruj nagłówki CORS
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Content-Type": "application/json",
+    }
+
+    // Zwróć błąd
     return ContentService.createTextOutput(
       JSON.stringify({
         success: false,
         error: error.toString(),
+        timestamp: new Date().toISOString(),
       }),
     )
       .setMimeType(ContentService.MimeType.JSON)
-      .setHeaders({
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Content-Type": "application/json",
-      })
+      .setHeaders(headers)
   }
 }
 
-/**
- * Obsługuje żądania OPTIONS (preflight) dla CORS
- */
-function doOptions(e) {
+// Funkcja doGet obsługuje żądania GET (np. do testowania)
+function doGet() {
+  return ContentService.createTextOutput(
+    JSON.stringify({
+      status: "API is running",
+      timestamp: new Date().toISOString(),
+    }),
+  ).setMimeType(ContentService.MimeType.JSON)
+}
+
+// Funkcja doOptions obsługuje żądania OPTIONS (pre-flight dla CORS)
+function doOptions() {
   const headers = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Max-Age": "86400",
+    "Access-Control-Max-Age": "3600",
     "Content-Type": "application/json",
   }
 
-  return ContentService.createTextOutput(JSON.stringify({ status: "ok" }))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeaders(headers)
+  return ContentService.createTextOutput("").setMimeType(ContentService.MimeType.JSON).setHeaders(headers)
 }

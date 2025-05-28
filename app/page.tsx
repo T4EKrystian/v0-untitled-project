@@ -15,7 +15,6 @@ import { WebinarInfoSection } from "@/components/sections/webinar-info-section"
 import { TestimonialsSection } from "@/components/sections/testimonials-section"
 import { FAQSection } from "@/components/sections/faq-section"
 import { FinalCTASection } from "@/components/sections/final-cta-section"
-import { NotForEveryoneSection } from "@/components/sections/not-for-everyone-section"
 import { ForWhomSection } from "@/components/sections/for-whom-section"
 import { WebinarPopupForm } from "@/components/webinar-popup-form"
 import { PropertyGallerySection } from "@/components/sections/property-gallery-section"
@@ -102,7 +101,6 @@ export default function LandingPage() {
         <InvestmentProcessSection />
         <WebinarInfoSection onCtaClick={handleCtaClick} />
         <ForWhomSection />
-        <NotForEveryoneSection />
         <TestimonialsSection />
         <FAQSection />
         <FinalCTASection onCtaClick={handleCtaClick} />

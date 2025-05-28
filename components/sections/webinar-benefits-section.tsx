@@ -30,7 +30,7 @@ export function WebinarBenefitsSection({ onCtaClick }: WebinarBenefitsSectionPro
       icon: <TrendingUp className="h-8 w-8" strokeWidth={1} />,
       title: "Analiza rynku nieruchomości",
       description:
-        "Pokażemy, dlaczego ceny w Dubaju rosną szybciej niż w Europie – i które lokalizacje dają największy potencjał wzrostu.",
+        "Pokażemy, dlaczego ceny w Dubaju rosną szybciej niż w Europie – i które lokalizacje dają największy potencjał wzrostu 8-10% rocznie.",
     },
     {
       icon: <Coins className="h-8 w-8" strokeWidth={1} />,
@@ -42,7 +42,7 @@ export function WebinarBenefitsSection({ onCtaClick }: WebinarBenefitsSectionPro
       icon: <Crown className="h-8 w-8" strokeWidth={1} />,
       title: "Zarządzanie najmem",
       description:
-        "Nie musisz mieszkać w Dubaju – pokażemy Ci, jak zarządzać nieruchomością zdalnie, przez sprawdzone firmy.",
+        "Nie musisz mieszkać w Dubaju – pokażemy Ci, jak zarządzać nieruchomościami zdalnie, przez sprawdzone firmy.",
     },
     {
       icon: <Globe className="h-8 w-8" strokeWidth={1} />,
@@ -113,7 +113,7 @@ export function WebinarBenefitsSection({ onCtaClick }: WebinarBenefitsSectionPro
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
               <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" strokeWidth={1} />
-              <span className="text-gray-500">zainwestować i zarabiać pasywnie</span>
+              <span className="text-gray-500">zainwestować i zarabiać pasywnie z ROI 8-10%</span>
             </li>
             <li className="flex items-start gap-3">
               <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" strokeWidth={1} />

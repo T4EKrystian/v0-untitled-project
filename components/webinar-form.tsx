@@ -1,13 +1,11 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LimitedSpotsCounter } from "./limited-spots-counter"
-import { submitForm } from "@/app/actions/submit-form"
 import { Loader2, CheckCircle } from "lucide-react"
 
 interface WebinarFormProps {
@@ -40,12 +38,42 @@ function saveSubmissionLocally(data: { name: string; email: string; phone: strin
   }
 }
 
+// Funkcja do bezpośredniego wysyłania danych do Google Apps Script
+async function sendDirectToGoogleAppsScript(data: { name: string; email: string; phone: string }) {
+  try {
+    // Hardcodowany URL do Google Apps Script
+    const scriptUrl =
+      "https://script.google.com/macros/s/AKfycbwJxKCZKT_-Vv9-Vy-U1ADnFCT-LYqT0JsJVIJA9FjNDVNuS3GVYTuuB_FMbNdQjlWV/exec"
+
+    console.log("Client: Bezpośrednie wysyłanie do Google Apps Script:", scriptUrl)
+
+    // Dodajemy parametry do URL, aby obejść cache
+    const urlWithParams = `${scriptUrl}?t=${Date.now()}`
+
+    // Używamy fetch z trybem no-cors, aby uniknąć problemów z CORS
+    const response = await fetch(urlWithParams, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...data,
+        timestamp: new Date().toISOString(),
+        source: window.location.href,
+      }),
+      mode: "no-cors", // Ważne dla CORS
+    })
+
+    console.log("Client: Odpowiedź z bezpośredniego wysyłania:", response)
+    return true
+  } catch (error) {
+    console.error("Client: Błąd podczas bezpośredniego wysyłania:", error)
+    return false
+  }
+}
+
 export function WebinarForm({ formStyle = "light", simplified = false }: WebinarFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formStatus, setFormStatus] = useState<{
-    success?: boolean
-    message?: string
-  }>({})
   const [submitted, setSubmitted] = useState(false)
 
   // Stan dla pól formularza
@@ -64,51 +92,23 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setFormStatus({})
 
     console.log("Client: Rozpoczęcie wysyłania formularza")
 
     try {
       // 1. Zapisz dane lokalnie jako backup
-      const localSaveSuccess = saveSubmissionLocally(formData)
-      console.log("Client: Zapisano lokalnie:", localSaveSuccess)
+      saveSubmissionLocally(formData)
 
-      // 2. Przygotuj FormData
-      const formDataToSend = new FormData()
+      // 2. Spróbuj wysłać dane bezpośrednio do Google Apps Script
+      await sendDirectToGoogleAppsScript(formData)
 
-      // Ręcznie dodajemy dane do FormData
-      formDataToSend.append("name", formData.name)
-      formDataToSend.append("email", formData.email)
-      formDataToSend.append("phone", formData.phone)
-
-      console.log("Client: Dane formularza:", {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-      })
-
-      // 3. Wywołaj Server Action
-      console.log("Client: Wysyłanie do Server Action")
-      const result = await submitForm(formDataToSend)
-      console.log("Client: Odpowiedź z Server Action:", result)
-
-      // 4. Ustaw status formularza
-      setFormStatus({
-        success: true,
-        message: result.message || "Dziękujemy! Twoje zgłoszenie zostało przyjęte.",
-      })
-
-      // 5. Oznacz formularz jako wysłany
+      // 3. Oznacz formularz jako wysłany
       setSubmitted(true)
       console.log("Client: Formularz przetworzony pomyślnie")
     } catch (error) {
       console.error("Client: Błąd podczas wysyłania formularza:", error)
 
       // Nawet w przypadku błędu, pokazujemy użytkownikowi sukces
-      setFormStatus({
-        success: true,
-        message: "Dziękujemy! Twoje zgłoszenie zostało przyjęte.",
-      })
       setSubmitted(true)
     } finally {
       setIsSubmitting(false)
@@ -202,14 +202,6 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
             </div>
 
             {!simplified && <LimitedSpotsCounter totalSpots={50} takenSpots={42} className="mt-2" />}
-
-            {formStatus.message && (
-              <div
-                className={`text-sm text-center p-2 rounded ${formStatus.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
-              >
-                {formStatus.message}
-              </div>
-            )}
 
             <Button
               variant="modern"

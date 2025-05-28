@@ -18,15 +18,15 @@ export function WebinarHostInfo() {
         </div>
         <div>
           <p className="font-medium text-lg sm:text-xl text-gold-300 mb-1">Adam Nowak</p>
-          <p className="text-white font-normal mb-2">Dyrektor ds. Inwestycji Międzynarodowych</p>
+          <p className="text-white font-normal mb-2">Opiekun Inwestorów</p>
           <div className="flex flex-wrap gap-2 mt-2">
             <div className="flex items-center gap-1 bg-navy-700/50 px-2 py-1 rounded-md">
               <Award className="h-3.5 w-3.5 text-gold-300" />
-              <span className="text-xs text-white">10+ lat doświadczenia</span>
+              <span className="text-xs text-white">13+ lat doświadczenia</span>
             </div>
             <div className="flex items-center gap-1 bg-navy-700/50 px-2 py-1 rounded-md">
               <Building2 className="h-3.5 w-3.5 text-gold-300" />
-              <span className="text-xs text-white">150+ transakcji</span>
+              <span className="text-xs text-white">400+ transakcji</span>
             </div>
             <div className="flex items-center gap-1 bg-navy-700/50 px-2 py-1 rounded-md">
               <Briefcase className="h-3.5 w-3.5 text-gold-300" />
@@ -34,8 +34,8 @@ export function WebinarHostInfo() {
             </div>
           </div>
           <p className="text-gray-300 text-sm mt-3">
-            Specjalista w zakresie inwestycji premium w Dubaju. Pomógł setkom klientów z Europy w bezpiecznym lokowaniu
-            kapitału w nieruchomościach o najwyższym potencjale wzrostu.
+            Specjalista w zakresie inwestycji premium w Dubaju. Pomógł ponad 400 klientom z Europy w bezpiecznym
+            lokowaniu kapitału w nieruchomościach o najwyższym potencjale wzrostu.
           </p>
         </div>
       </div>

@@ -68,8 +68,8 @@ export function PropertyValueSection() {
                 </div>
                 <h3 className="text-sm font-medium text-white">Wzrost cen w 2023</h3>
               </div>
-              <p className="text-3xl font-bold mb-2 text-gold-300">+14,2%</p>
-              <p className="text-gray-300/80 text-sm">Średni wzrost cen nieruchomości w Dubaju w 2023 roku</p>
+              <p className="text-3xl font-bold mb-2 text-gold-300">+18,7%</p>
+              <p className="text-gray-300/80 text-sm">Średni wzrost cen nieruchomości w Dubaju w 2024 roku</p>
             </CardContent>
           </Card>
 
@@ -101,9 +101,7 @@ export function PropertyValueSection() {
                 <h3 className="text-sm font-medium text-white">Zwrot z wynajmu</h3>
               </div>
               <p className="text-3xl font-bold mb-2 text-gold-300">8-10%</p>
-              <p className="text-gray-300/80 text-sm">
-                Średni roczny zwrot z inwestycji przy wynajmie krótkoterminowym
-              </p>
+              <p className="text-gray-300/80 text-sm">Średni roczny zwrot z inwestycji przy wynajmie długoterminowym</p>
             </CardContent>
           </Card>
 
@@ -118,7 +116,7 @@ export function PropertyValueSection() {
                 </div>
                 <h3 className="text-sm font-medium text-white">Prognoza 2025</h3>
               </div>
-              <p className="text-3xl font-bold mb-2 text-gold-300">+16,5%</p>
+              <p className="text-3xl font-bold mb-2 text-gold-300">+15,2%</p>
               <p className="text-gray-300/80 text-sm">Przewidywany wzrost cen nieruchomości w Dubaju w 2025 roku</p>
             </CardContent>
           </Card>

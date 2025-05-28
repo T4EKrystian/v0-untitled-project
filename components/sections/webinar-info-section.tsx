@@ -15,7 +15,7 @@ export function WebinarInfoSection({ onCtaClick }: WebinarInfoSectionProps) {
   const webinarFeatures = [
     "Aktualna sytuacja na rynku i ceny nieruchomości",
     "Jak uniknąć błędów na starcie",
-    "Przykładowe zwroty z inwestycji (8–10% rocznie)",
+    "Przykładowe zwroty z inwestycji",
     "Jak wygląda współpraca z lokalnymi operatorami",
     "Przewodnik po dzielnicach – co, gdzie i za ile",
   ]
@@ -112,7 +112,7 @@ export function WebinarInfoSection({ onCtaClick }: WebinarInfoSectionProps) {
                 </div>
                 <div>
                   <p className="font-medium text-lg">Adam Nowak</p>
-                  <p className="text-navy-600">Dyrektor ds. Inwestycji Międzynarodowych z 10-letnim doświadczeniem</p>
+                  <p className="text-navy-600">Opiekun Inwestorów z 13-letnim doświadczeniem</p>
                 </div>
               </div>
               <Button variant="modern" size="lg" onClick={onCtaClick} className="w-full refined-button">
