@@ -26,7 +26,7 @@ import { DubaiLuxuryGallery } from "@/components/sections/dubai-luxury-gallery"
 import { useIsMobile } from "@/hooks/use-mobile"
 
 export default function LandingPage() {
-  const webinarDate = "May 15, 2025 19:00:00"
+  const webinarDate = "July 27, 2025 19:30:00"
   const [isFormOpen, setIsFormOpen] = useState(false)
   const isMobile = useIsMobile()
 

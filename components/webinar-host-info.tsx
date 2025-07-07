@@ -10,14 +10,14 @@ export function WebinarHostInfo() {
         <div className="relative h-24 w-24 sm:h-28 sm:w-28 rounded-full overflow-hidden refined-shadow shrink-0 border-2 border-gold/30">
           <Image
             src="/images/real-estate-expert.jpeg"
-            alt="Adam Nowak - ekspert rynku nieruchomości w Dubaju"
+            alt="Wojciech Paciejewski - ekspert rynku nieruchomości w Dubaju"
             fill
             className="object-cover"
             sizes="(max-width: 768px) 96px, 112px"
           />
         </div>
         <div>
-          <p className="font-medium text-lg sm:text-xl text-gold-300 mb-1">Adam Nowak</p>
+          <p className="font-medium text-lg sm:text-xl text-gold-300 mb-1">Wojciech Paciejewski</p>
           <p className="text-white font-normal mb-2">
             Zaufany Opiekun Inwestorów na Rynku Nieruchomości z 13-letnim doświadczeniem.
           </p>
