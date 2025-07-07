@@ -32,7 +32,8 @@ export function LimitedSpotsCounter({
     return () => clearInterval(interval)
   }, [takenSpots, totalSpots])
 
-  return (
-    
-  )
+  // ──────────────────────────────────────────────────────────
+  // RENDER
+  // ──────────────────────────────────────────────────────────
+  return null
 }
