@@ -18,7 +18,9 @@ export function WebinarHostInfo() {
         </div>
         <div>
           <p className="font-medium text-lg sm:text-xl text-gold-300 mb-1">Adam Nowak</p>
-          <p className="text-white font-normal mb-2">Opiekun Inwestorów</p>
+          <p className="text-white font-normal mb-2">
+            Zaufany Opiekun Inwestorów na Rynku Nieruchomości z 13-letnim doświadczeniem.
+          </p>
           <div className="flex flex-wrap gap-2 mt-2">
             <div className="flex items-center gap-1 bg-navy-700/50 px-2 py-1 rounded-md">
               <Award className="h-3.5 w-3.5 text-gold-300" />
@@ -34,8 +36,10 @@ export function WebinarHostInfo() {
             </div>
           </div>
           <p className="text-gray-300 text-sm mt-3">
-            Specjalista w zakresie inwestycji premium w Dubaju. Pomógł ponad 400 klientom z Europy w bezpiecznym
-            lokowaniu kapitału w nieruchomościach o najwyższym potencjale wzrostu.
+            W ciągu ponad dekady z sukcesem przeprowadził przeszło 400 transakcji, pomagając inwestorom w osiąganiu
+            stabilnych i dochodowych portfeli nieruchomości. Specjalizuje się w doradztwie strategicznym, analizie rynku
+            oraz budowaniu długoterminowych relacji opartych o wspólne zarabianie na najbardziej perspektywicznych
+            rynkach nieruchomości.
           </p>
         </div>
       </div>

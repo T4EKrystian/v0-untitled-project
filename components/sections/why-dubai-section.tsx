@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { MapPin, CheckCircle, TrendingUp, Building2, Shield, Users, Percent, Home, Briefcase } from "lucide-react"
+import { MapPin, CheckCircle, TrendingUp, Building2, Shield, Users, Home, Briefcase } from "lucide-react"
 import { SectionTitle } from "@/components/ui/section-title"
 
 export function WhyDubaiSection() {
@@ -46,11 +46,6 @@ export function WhyDubaiSection() {
       title: "Międzynarodowe środowisko",
       description:
         "Ponad 85% mieszkańców to ekspatrianci. Dubaj jest kosmopolitycznym centrum, które przyciąga talenty i inwestorów z całego świata.",
-    },
-    {
-      icon: <Percent className="h-8 w-8" strokeWidth={1} />,
-      title: "Wysoka stopa zwrotu",
-      description: "Wynajmy krótkoterminowe generują nawet 8–12% ROI. Bez podatku, bez komplikacji.",
     },
     {
       icon: <Home className="h-8 w-8" strokeWidth={1} />,
