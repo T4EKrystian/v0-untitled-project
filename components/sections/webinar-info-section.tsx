@@ -119,17 +119,7 @@ export function WebinarInfoSection({ onCtaClick }: WebinarInfoSectionProps) {
           <div className="space-y-4 sm:space-y-5 fade-in" style={{ animationDelay: "0.3s" }}>
             <WebinarHostInfo />
 
-            <div className="bg-white p-4 sm:p-5 rounded-md refined-shadow mb-4 sm:mb-6">
-              <h3 className="text-lg sm:text-xl luxury-heading mb-3">Podczas webinaru poznasz:</h3>
-              <div className="space-y-3">
-                {webinarFeatures.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-gold-500 shrink-0 mt-0.5" strokeWidth={1} />
-                    <span className="text-navy-600 text-lg">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            
 
             <div className="pt-2 sm:pt-3">
               <Button variant="modern" size="lg" onClick={onCtaClick} className="w-full refined-button">
