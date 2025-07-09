@@ -73,73 +73,236 @@ export async function POST(request: NextRequest) {
         console.log("Server: ✅ Dostępne webinary:", JSON.stringify(webinars, null, 2))
 
         if (webinars.length > 0) {
-          const webinar = webinars[0]
-          const webinarId = webinar.webinarId
-          console.log("Server: Używam webinar ID:", webinarId)
+          // Znajdź webinar z otwartymi rejestracjami
+          let selectedWebinar = null
 
-          // Spróbuj zarejestrować uczestnika
-          console.log("Server: Rejestrowanie uczestnika...")
-          const registrationPayload = {
-            email: email,
-            name: name,
+          for (const webinar of webinars) {
+            console.log(`Server: Sprawdzanie webinaru ${webinar.webinarId}:`, {
+              name: webinar.name,
+              status: webinar.status,
+              startsOn: webinar.startsOn,
+              registrationSettings: webinar.registrationSettings,
+            })
+
+            // Sprawdź czy webinar ma otwarte rejestracje
+            if (webinar.status === "active" || webinar.status === "draft") {
+              selectedWebinar = webinar
+              break
+            }
           }
 
-          console.log("Server: Registration payload:", JSON.stringify(registrationPayload, null, 2))
-
-          const registrationResponse = await fetch(
-            `https://api.getresponse.com/v3/webinars/${webinarId}/registrations`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Auth-Token": `api-key ${apiKey}`,
-              },
-              body: JSON.stringify(registrationPayload),
-            },
-          )
-
-          console.log("Server: Registration response status:", registrationResponse.status)
-
-          if (registrationResponse.ok) {
-            const result = await registrationResponse.json()
-            console.log("Server: ✅ Pomyślnie zarejestrowano w GetResponse:", JSON.stringify(result, null, 2))
-
-            return NextResponse.json({
-              success: true,
-              data: result,
-              message: "Rejestracja zakończona pomyślnie! Sprawdź swoją skrzynkę email.",
-              debug: {
-                getResponse: "success",
-                webinarId: webinarId,
-                registrationId: result.registrationId || result.id,
-              },
+          if (selectedWebinar) {
+            const webinarId = selectedWebinar.webinarId
+            console.log("Server: Używam webinar ID:", webinarId)
+            console.log("Server: Webinar details:", {
+              name: selectedWebinar.name,
+              status: selectedWebinar.status,
+              startsOn: selectedWebinar.startsOn,
             })
+
+            // Spróbuj zarejestrować uczestnika
+            console.log("Server: Rejestrowanie uczestnika...")
+            const registrationPayload = {
+              email: email,
+              name: name,
+            }
+
+            console.log("Server: Registration payload:", JSON.stringify(registrationPayload, null, 2))
+
+            const registrationResponse = await fetch(
+              `https://api.getresponse.com/v3/webinars/${webinarId}/registrations`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-Auth-Token": `api-key ${apiKey}`,
+                },
+                body: JSON.stringify(registrationPayload),
+              },
+            )
+
+            console.log("Server: Registration response status:", registrationResponse.status)
+
+            if (registrationResponse.ok) {
+              const result = await registrationResponse.json()
+              console.log("Server: ✅ Pomyślnie zarejestrowano w GetResponse:", JSON.stringify(result, null, 2))
+
+              return NextResponse.json({
+                success: true,
+                data: result,
+                message: "Rejestracja zakończona pomyślnie! Sprawdź swoją skrzynkę email.",
+                debug: {
+                  getResponse: "success",
+                  webinarId: webinarId,
+                  webinarName: selectedWebinar.name,
+                  registrationId: result.registrationId || result.id,
+                },
+              })
+            } else {
+              const errorData = await registrationResponse.text()
+              console.error("Server: ❌ Błąd rejestracji GetResponse:", errorData)
+
+              // Spróbuj dodać do listy kontaktów jako fallback
+              console.log("Server: Próbuję dodać do listy kontaktów jako fallback...")
+
+              try {
+                // Pobierz dostępne listy
+                const listsResponse = await fetch("https://api.getresponse.com/v3/campaigns", {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "X-Auth-Token": `api-key ${apiKey}`,
+                  },
+                })
+
+                if (listsResponse.ok) {
+                  const lists = await listsResponse.json()
+                  console.log("Server: Dostępne listy:", lists)
+
+                  if (lists.length > 0) {
+                    const listId = lists[0].campaignId
+                    console.log("Server: Dodaję do listy:", listId)
+
+                    const contactPayload = {
+                      email: email,
+                      name: name,
+                      campaign: { campaignId: listId },
+                      customFieldValues: [
+                        {
+                          customFieldId: "phone",
+                          value: [phone],
+                        },
+                      ],
+                    }
+
+                    const contactResponse = await fetch("https://api.getresponse.com/v3/contacts", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        "X-Auth-Token": `api-key ${apiKey}`,
+                      },
+                      body: JSON.stringify(contactPayload),
+                    })
+
+                    if (contactResponse.ok) {
+                      const contactResult = await contactResponse.json()
+                      console.log("Server: ✅ Dodano do listy kontaktów:", contactResult)
+
+                      return NextResponse.json({
+                        success: true,
+                        data: contactResult,
+                        message: "Rejestracja zakończona pomyślnie! Skontaktujemy się z Tobą wkrótce.",
+                        debug: {
+                          getResponse: "added_to_list",
+                          listId: listId,
+                          contactId: contactResult.contactId,
+                          webinarError: errorData,
+                        },
+                      })
+                    }
+                  }
+                }
+              } catch (listError) {
+                console.error("Server: Błąd dodawania do listy:", listError)
+              }
+
+              return NextResponse.json(
+                {
+                  success: false,
+                  message: "Błąd podczas rejestracji na webinar",
+                  error: errorData,
+                  debug: {
+                    getResponse: "registration_failed",
+                    webinarId: webinarId,
+                    webinarName: selectedWebinar.name,
+                    error: errorData,
+                  },
+                },
+                { status: 400 },
+              )
+            }
           } else {
-            const errorData = await registrationResponse.text()
-            console.error("Server: ❌ Błąd rejestracji GetResponse:", errorData)
+            console.log("Server: ❌ Brak webinarów z otwartymi rejestracjami")
+
+            // Spróbuj dodać do listy kontaktów
+            try {
+              const listsResponse = await fetch("https://api.getresponse.com/v3/campaigns", {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-Auth-Token": `api-key ${apiKey}`,
+                },
+              })
+
+              if (listsResponse.ok) {
+                const lists = await listsResponse.json()
+                console.log("Server: Dostępne listy:", lists)
+
+                if (lists.length > 0) {
+                  const listId = lists[0].campaignId
+                  console.log("Server: Dodaję do listy:", listId)
+
+                  const contactPayload = {
+                    email: email,
+                    name: name,
+                    campaign: { campaignId: listId },
+                  }
+
+                  const contactResponse = await fetch("https://api.getresponse.com/v3/contacts", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "X-Auth-Token": `api-key ${apiKey}`,
+                    },
+                    body: JSON.stringify(contactPayload),
+                  })
+
+                  if (contactResponse.ok) {
+                    const contactResult = await contactResponse.json()
+                    console.log("Server: ✅ Dodano do listy kontaktów:", contactResult)
+
+                    return NextResponse.json({
+                      success: true,
+                      data: contactResult,
+                      message: "Rejestracja zakończona pomyślnie! Skontaktujemy się z Tobą wkrótce.",
+                      debug: {
+                        getResponse: "added_to_list_no_webinar",
+                        listId: listId,
+                        contactId: contactResult.contactId,
+                      },
+                    })
+                  }
+                }
+              }
+            } catch (listError) {
+              console.error("Server: Błąd dodawania do listy:", listError)
+            }
 
             return NextResponse.json(
               {
                 success: false,
-                message: "Błąd podczas rejestracji",
-                error: errorData,
+                message: "Brak dostępnych webinarów z otwartymi rejestracjami",
+                error: "No active webinars with open registration",
                 debug: {
-                  getResponse: "registration_failed",
-                  webinarId: webinarId,
-                  error: errorData,
+                  getResponse: "no_active_webinars",
+                  availableWebinars: webinars.map((w) => ({
+                    id: w.webinarId,
+                    name: w.name,
+                    status: w.status,
+                  })),
                 },
               },
-              { status: 400 },
+              { status: 404 },
             )
           }
         } else {
-          console.log("Server: ❌ Brak dostępnych webinarów")
+          console.log("Server: ❌ Brak webinarów")
 
           return NextResponse.json(
             {
               success: false,
               message: "Brak dostępnych webinarów",
-              error: "No webinars available",
+              error: "No webinars found",
               debug: {
                 getResponse: "no_webinars",
               },
