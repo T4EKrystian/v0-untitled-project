@@ -13,43 +13,30 @@ interface WebinarFormProps {
   simplified?: boolean
 }
 
-// Funkcja do wysyłania danych do GetResponse
-async function sendToGetResponse(data: { name: string; email: string; phone: string }) {
+// Funkcja do wysyłania danych przez API route
+async function sendToWebinarAPI(data: { name: string; email: string; phone: string }) {
   try {
-    const apiKey = "wic2ysqcn4we1qmg9u2e8s67gd1v64c5"
-    const webinarId = "VDWKD" // ID webinaru z URL
+    console.log("Client: Wysyłanie przez API route")
 
-    console.log("Client: Wysyłanie do GetResponse API")
-
-    // Wysyłanie do GetResponse API
-    const response = await fetch(`https://api.getresponse.com/v3/webinars/${webinarId}/registrations`, {
+    const response = await fetch("/api/webinar-registration", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Auth-Token": `api-key ${apiKey}`,
       },
-      body: JSON.stringify({
-        email: data.email,
-        name: data.name,
-        customFieldValues: [
-          {
-            customFieldId: "phone",
-            value: [data.phone],
-          },
-        ],
-      }),
+      body: JSON.stringify(data),
     })
 
     if (response.ok) {
-      console.log("Client: Pomyślnie wysłano do GetResponse")
+      const result = await response.json()
+      console.log("Client: Pomyślnie wysłano przez API route")
       return true
     } else {
-      const errorData = await response.text()
-      console.error("Client: Błąd GetResponse API:", errorData)
+      const errorData = await response.json()
+      console.error("Client: Błąd API route:", errorData)
       return false
     }
   } catch (error) {
-    console.error("Client: Błąd podczas wysyłania do GetResponse:", error)
+    console.error("Client: Błąd podczas wysyłania przez API route:", error)
     return false
   }
 }
@@ -102,16 +89,16 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
       // 1. Zapisz dane lokalnie jako backup
       saveSubmissionLocally(formData)
 
-      // 2. Spróbuj wysłać dane do GetResponse
-      const getResponseSuccess = await sendToGetResponse(formData)
+      // 2. Spróbuj wysłać dane przez API route
+      const apiSuccess = await sendToWebinarAPI(formData)
 
       // 3. Oznacz formularz jako wysłany (niezależnie od wyniku API)
       setSubmitted(true)
 
-      if (getResponseSuccess) {
-        console.log("Client: Formularz wysłany pomyślnie do GetResponse")
+      if (apiSuccess) {
+        console.log("Client: Formularz wysłany pomyślnie")
       } else {
-        console.log("Client: Formularz zapisany lokalnie, problem z GetResponse API")
+        console.log("Client: Formularz zapisany lokalnie, problem z API")
       }
     } catch (error) {
       console.error("Client: Błąd podczas wysyłania formularza:", error)
