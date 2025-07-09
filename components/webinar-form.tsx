@@ -26,17 +26,45 @@ async function sendToWebinarAPI(data: { name: string; email: string; phone: stri
       body: JSON.stringify(data),
     })
 
-    if (response.ok) {
-      const result = await response.json()
+    const result = await response.json()
+
+    if (response.ok && result.success) {
       console.log("Client: Pomyślnie wysłano przez API route")
-      return true
+      return { success: true, message: result.message }
     } else {
-      const errorData = await response.json()
-      console.error("Client: Błąd API route:", errorData)
-      return false
+      console.error("Client: Błąd API route:", result)
+      return { success: false, error: result.error }
     }
   } catch (error) {
     console.error("Client: Błąd podczas wysyłania przez API route:", error)
+    return { success: false, error: "Błąd połączenia" }
+  }
+}
+
+// Funkcja do wysyłania bezpośrednio do Google Apps Script jako fallback
+async function sendToGoogleScript(data: { name: string; email: string; phone: string }) {
+  try {
+    console.log("Client: Wysyłanie do Google Apps Script")
+
+    const response = await fetch(process.env.NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL || "", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...data,
+        timestamp: new Date().toISOString(),
+        source: "webinar-form-fallback",
+      }),
+    })
+
+    if (response.ok) {
+      console.log("Client: Pomyślnie wysłano do Google Apps Script")
+      return true
+    }
+    return false
+  } catch (error) {
+    console.error("Client: Błąd Google Apps Script:", error)
     return false
   }
 }
@@ -65,6 +93,7 @@ function saveSubmissionLocally(data: { name: string; email: string; phone: strin
 export function WebinarForm({ formStyle = "light", simplified = false }: WebinarFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState("")
 
   // Stan dla pól formularza
   const [formData, setFormData] = useState({
@@ -90,19 +119,28 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
       saveSubmissionLocally(formData)
 
       // 2. Spróbuj wysłać dane przez API route
-      const apiSuccess = await sendToWebinarAPI(formData)
+      const apiResult = await sendToWebinarAPI(formData)
 
-      // 3. Oznacz formularz jako wysłany (niezależnie od wyniku API)
-      setSubmitted(true)
-
-      if (apiSuccess) {
+      if (apiResult.success) {
+        setSubmitMessage(apiResult.message || "Rejestracja zakończona pomyślnie!")
+        setSubmitted(true)
         console.log("Client: Formularz wysłany pomyślnie")
       } else {
-        console.log("Client: Formularz zapisany lokalnie, problem z API")
+        // 3. Jeśli API route nie działa, spróbuj Google Apps Script
+        console.log("Client: API route nie działa, próbuję Google Apps Script")
+        const googleResult = await sendToGoogleScript(formData)
+
+        if (googleResult) {
+          setSubmitMessage("Rejestracja została przyjęta! Skontaktujemy się z Tobą wkrótce.")
+        } else {
+          setSubmitMessage("Rejestracja została zapisana lokalnie. Skontaktujemy się z Tobą wkrótce.")
+        }
+        setSubmitted(true)
       }
     } catch (error) {
       console.error("Client: Błąd podczas wysyłania formularza:", error)
       // Nawet w przypadku błędu, pokazujemy użytkownikowi sukces
+      setSubmitMessage("Rejestracja została przyjęta! Dziękujemy za zainteresowanie.")
       setSubmitted(true)
     } finally {
       setIsSubmitting(false)
@@ -154,8 +192,9 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
             <h3 className={`text-xl font-bold mb-2 ${formStyle === "dark" ? "text-white" : "text-navy"}`}>
               Dziękujemy za rejestrację!
             </h3>
-            <p className={`${formStyle === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-              Wkrótce otrzymasz email z potwierdzeniem i szczegółami webinaru.
+            <p className={`${formStyle === "dark" ? "text-gray-300" : "text-gray-600"}`}>{submitMessage}</p>
+            <p className={`text-sm mt-2 ${formStyle === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+              Szczegóły webinaru otrzymasz na podany adres email.
             </p>
           </div>
         ) : (
