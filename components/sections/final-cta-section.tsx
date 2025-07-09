@@ -80,11 +80,11 @@ export function FinalCTASection({ onCtaClick }: FinalCTASectionProps) {
             style={{ transitionDelay: "0.4s" }}
           >
             <div className="bg-gradient-to-br from-navy-800/90 to-navy-900 border-gold/30 border-0 rounded-md p-4 sm:p-5 text-center refined-shadow card-stack hover-lift">
-              <div className="text-gold-300 text-2xl sm:text-3xl luxury-heading luxury-number">15</div>
-              <div className="text-gray-300/80">maja 2025</div>
+              <div className="text-gold-300 text-2xl sm:text-3xl luxury-heading luxury-number">27</div>
+              <div className="text-gray-300/80">lipca 2025</div>
             </div>
             <div className="bg-gradient-to-br from-navy-800/90 to-navy-900 border-gold/30 border-0 rounded-md p-4 sm:p-5 text-center refined-shadow card-stack hover-lift">
-              <div className="text-gold-300 text-2xl sm:text-3xl luxury-heading luxury-number">19:00</div>
+              <div className="text-gold-300 text-2xl sm:text-3xl luxury-heading luxury-number">19:30</div>
               <div className="text-gray-300/80">czasu polskiego</div>
             </div>
           </div>

@@ -123,7 +123,7 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
         <CardHeader className="pb-2 px-4 md:px-6">
           <div className="modern-badge inline-block mb-2 text-xs md:text-sm">
             <span className="designer-dot"></span>
-            Najbliższy webinar: 15 maja 2025
+            Najbliższy webinar: 27 lipca 2025
           </div>
           <CardTitle
             className={`text-lg md:text-xl luxury-heading ${formStyle === "dark" ? "text-white" : "text-navy"}`}
