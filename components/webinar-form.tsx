@@ -38,36 +38,46 @@ function saveSubmissionLocally(data: { name: string; email: string; phone: strin
   }
 }
 
-// Funkcja do bezpośredniego wysyłania danych do Google Apps Script
-async function sendDirectToGoogleAppsScript(data: { name: string; email: string; phone: string }) {
+// Funkcja do wysyłania danych do GetResponse
+async function sendToGetResponse(data: { name: string; email: string; phone: string }) {
   try {
-    // Hardcodowany URL do Google Apps Script
-    const scriptUrl =
-      "https://script.google.com/macros/s/AKfycbwJxKCZKT_-Vv9-Vy-U1ADnFCT-LYqT0JsJVIJA9FjNDVNuS3GVYTuuB_FMbNdQjlWV/exec"
+    const apiKey = "wic2ysqcn4we1qmg9u2e8s67gd1v64c5"
+    const apiUrl = "https://api.getresponse.com/v3/contacts"
 
-    console.log("Client: Bezpośrednie wysyłanie do Google Apps Script:", scriptUrl)
+    console.log("Client: Wysyłanie do GetResponse API")
 
-    // Dodajemy parametry do URL, aby obejść cache
-    const urlWithParams = `${scriptUrl}?t=${Date.now()}`
-
-    // Używamy fetch z trybem no-cors, aby uniknąć problemów z CORS
-    const response = await fetch(urlWithParams, {
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Auth-Token": `api-key ${apiKey}`,
       },
       body: JSON.stringify({
-        ...data,
-        timestamp: new Date().toISOString(),
-        source: window.location.href,
+        name: data.name,
+        email: data.email,
+        customFieldValues: [
+          {
+            customFieldId: "phone",
+            value: [data.phone],
+          },
+        ],
+        campaign: {
+          campaignId: "Dubai-Invest",
+        },
+        tags: ["webinar-dubai", "nieruchomosci-dubai"],
+        note: `Zapisany na webinar: Jak skutecznie inwestować w nieruchomości w Dubaju? - 27 lipca 2025, 19:30`,
       }),
-      mode: "no-cors", // Ważne dla CORS
     })
 
-    console.log("Client: Odpowiedź z bezpośredniego wysyłania:", response)
-    return true
+    if (response.ok) {
+      console.log("Client: Dane wysłane pomyślnie do GetResponse")
+      return true
+    } else {
+      console.error("Client: Błąd GetResponse API:", response.status, response.statusText)
+      return false
+    }
   } catch (error) {
-    console.error("Client: Błąd podczas bezpośredniego wysyłania:", error)
+    console.error("Client: Błąd podczas wysyłania do GetResponse:", error)
     return false
   }
 }
@@ -100,7 +110,7 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
       saveSubmissionLocally(formData)
 
       // 2. Spróbuj wysłać dane bezpośrednio do Google Apps Script
-      await sendDirectToGoogleAppsScript(formData)
+      await sendToGetResponse(formData)
 
       // 3. Oznacz formularz jako wysłany
       setSubmitted(true)
