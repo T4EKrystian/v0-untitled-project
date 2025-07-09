@@ -119,11 +119,11 @@ export async function POST(request: NextRequest) {
       console.error("Server: ❌ Webinar check error:", webinarError)
     }
 
-    // KROK 2: Fallback - dodaj do listy kontaktów
-    console.log("Server: KROK 2 - Dodawanie do listy kontaktów...")
+    // KROK 2: Fallback - dodaj do listy kontaktów "wojciech"
+    console.log("Server: KROK 2 - Dodawanie do listy kontaktów 'wojciech'...")
 
     try {
-      // Najpierw pobierz listy
+      // Najpierw pobierz listy i znajdź "wojciech"
       console.log("Server: Pobieranie list kontaktów...")
       const listsResponse = await fetch("https://api.getresponse.com/v3/campaigns", {
         method: "GET",
@@ -151,12 +151,27 @@ export async function POST(request: NextRequest) {
       const lists = listsParseResult.data
       console.log("Server: Available lists:", lists.length)
 
-      if (lists.length === 0) {
-        throw new Error("No campaigns/lists available")
+      // Loguj wszystkie dostępne listy
+      lists.forEach((list, index) => {
+        console.log(`Server: List ${index + 1}:`, {
+          id: list.campaignId,
+          name: list.name,
+        })
+      })
+
+      // Znajdź listę "wojciech"
+      const wojciechList = lists.find((list) => list.name.toLowerCase().includes("wojciech"))
+
+      if (!wojciechList) {
+        console.log("Server: ⚠️ Nie znaleziono listy 'wojciech', używam pierwszej dostępnej")
+        if (lists.length === 0) {
+          throw new Error("No campaigns/lists available")
+        }
       }
 
-      const listId = lists[0].campaignId
-      console.log("Server: Using list ID:", listId)
+      const listId = wojciechList ? wojciechList.campaignId : lists[0].campaignId
+      const listName = wojciechList ? wojciechList.name : lists[0].name
+      console.log("Server: Using list:", { id: listId, name: listName })
 
       // Sprawdź czy kontakt już istnieje
       console.log("Server: Sprawdzanie czy kontakt istnieje...")
@@ -180,6 +195,36 @@ export async function POST(request: NextRequest) {
           const existingContact = searchParseResult.data[0]
           console.log("Server: ✅ Contact already exists:", existingContact.contactId)
 
+          // Spróbuj zaktualizować istniejący kontakt z numerem telefonu
+          try {
+            const updatePayload = {
+              name: name,
+              customFieldValues: [
+                {
+                  customFieldId: "phone", // lub inny ID dla telefonu
+                  value: [phone],
+                },
+              ],
+            }
+
+            const updateResponse = await fetch(`https://api.getresponse.com/v3/contacts/${existingContact.contactId}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Auth-Token": `api-key ${apiKey}`,
+              },
+              body: JSON.stringify(updatePayload),
+            })
+
+            console.log("Server: Contact update status:", updateResponse.status)
+
+            if (updateResponse.ok) {
+              console.log("Server: ✅ Contact updated with phone number")
+            }
+          } catch (updateError) {
+            console.log("Server: ⚠️ Could not update contact with phone:", updateError)
+          }
+
           return NextResponse.json({
             success: true,
             data: existingContact,
@@ -187,17 +232,24 @@ export async function POST(request: NextRequest) {
             debug: {
               method: "contact_exists",
               contactId: existingContact.contactId,
+              listUsed: listName,
             },
           })
         }
       }
 
-      // Dodaj nowy kontakt
-      console.log("Server: Dodawanie nowego kontaktu...")
+      // Dodaj nowy kontakt z numerem telefonu
+      console.log("Server: Dodawanie nowego kontaktu z numerem telefonu...")
       const contactPayload = {
         email: email,
         name: name,
         campaign: { campaignId: listId },
+        customFieldValues: [
+          {
+            customFieldId: "phone",
+            value: [phone],
+          },
+        ],
       }
 
       console.log("Server: Contact payload:", contactPayload)
@@ -215,21 +267,61 @@ export async function POST(request: NextRequest) {
 
       if (contactResponse.ok) {
         const contactParseResult = await safeJsonParse(contactResponse)
-        console.log("Server: ✅ NEW CONTACT ADDED!")
+        console.log("Server: ✅ NEW CONTACT ADDED WITH PHONE!")
 
         return NextResponse.json({
           success: true,
           data: contactParseResult.data,
           message: "Dodano Cię do listy kontaktów. Skontaktujemy się z Tobą w sprawie webinaru.",
           debug: {
-            method: "new_contact_added",
+            method: "new_contact_added_with_phone",
             listId: listId,
+            listName: listName,
             contactId: contactParseResult.data?.contactId,
+            phoneIncluded: true,
           },
         })
       } else {
         const contactErrorResult = await safeJsonParse(contactResponse)
         console.error("Server: ❌ Contact creation failed:", contactErrorResult)
+
+        // Jeśli nie udało się z custom field, spróbuj bez telefonu
+        console.log("Server: Próba dodania kontaktu bez custom field telefonu...")
+        const simpleContactPayload = {
+          email: email,
+          name: name,
+          campaign: { campaignId: listId },
+        }
+
+        const simpleContactResponse = await fetch("https://api.getresponse.com/v3/contacts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Auth-Token": `api-key ${apiKey}`,
+          },
+          body: JSON.stringify(simpleContactPayload),
+        })
+
+        console.log("Server: Simple contact creation status:", simpleContactResponse.status)
+
+        if (simpleContactResponse.ok) {
+          const simpleContactParseResult = await safeJsonParse(simpleContactResponse)
+          console.log("Server: ✅ NEW CONTACT ADDED (without phone field)!")
+
+          return NextResponse.json({
+            success: true,
+            data: simpleContactParseResult.data,
+            message: "Dodano Cię do listy kontaktów. Skontaktujemy się z Tobą w sprawie webinaru.",
+            debug: {
+              method: "new_contact_added_simple",
+              listId: listId,
+              listName: listName,
+              contactId: simpleContactParseResult.data?.contactId,
+              phoneIncluded: false,
+              note: "Phone field not supported, contact added without phone",
+            },
+          })
+        }
 
         // Sprawdź czy to błąd duplikatu
         if (
@@ -242,6 +334,7 @@ export async function POST(request: NextRequest) {
             message: "Jesteś już w naszej bazie kontaktów.",
             debug: {
               method: "duplicate_contact_detected",
+              listUsed: listName,
             },
           })
         }
