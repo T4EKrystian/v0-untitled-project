@@ -27,10 +27,12 @@ async function sendToWebinarAPI(data: { name: string; email: string; phone: stri
     })
 
     const result = await response.json()
+    console.log("Client: API response:", result)
 
     if (response.ok && result.success) {
       console.log("Client: Pomyślnie wysłano przez API route")
-      return { success: true, message: result.message }
+      console.log("Client: Debug info:", result.debug)
+      return { success: true, message: result.message, debug: result.debug }
     } else {
       console.error("Client: Błąd API route:", result)
       return { success: false, error: result.error }
@@ -46,7 +48,12 @@ async function sendToGoogleScript(data: { name: string; email: string; phone: st
   try {
     console.log("Client: Wysyłanie do Google Apps Script")
 
-    const response = await fetch(process.env.NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL || "", {
+    // Użyj zmiennej środowiskowej lub URL z konfiguracji
+    const googleScriptUrl =
+      process.env.NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL ||
+      "https://script.google.com/macros/s/AKfycbwYourScriptIdHere/exec"
+
+    const response = await fetch(googleScriptUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,6 +101,7 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
+  const [debugInfo, setDebugInfo] = useState<any>(null)
 
   // Stan dla pól formularza
   const [formData, setFormData] = useState({
@@ -123,6 +131,7 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
 
       if (apiResult.success) {
         setSubmitMessage(apiResult.message || "Rejestracja zakończona pomyślnie!")
+        setDebugInfo(apiResult.debug)
         setSubmitted(true)
         console.log("Client: Formularz wysłany pomyślnie")
       } else {
@@ -196,6 +205,16 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
             <p className={`text-sm mt-2 ${formStyle === "dark" ? "text-gray-400" : "text-gray-500"}`}>
               Szczegóły webinaru otrzymasz na podany adres email.
             </p>
+
+            {/* Debug info - tylko w development */}
+            {debugInfo && process.env.NODE_ENV === "development" && (
+              <div className="mt-4 p-3 bg-gray-100 rounded text-left text-xs">
+                <p>
+                  <strong>Debug Info:</strong>
+                </p>
+                <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+              </div>
+            )}
           </div>
         ) : (
           <form className="grid gap-3 md:gap-4" onSubmit={handleSubmit}>
