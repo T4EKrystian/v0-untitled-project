@@ -3,12 +3,19 @@
 import { useState, useEffect } from "react"
 
 interface CountdownTimerProps {
-  /** ISO date string e.g. "2025-07-27T19:30:00" */
   targetDate: string
+  className?: string
 }
 
-export function CountdownTimer({ targetDate }: CountdownTimerProps) {
-  const [timeLeft, setTimeLeft] = useState({
+interface TimeLeft {
+  days: number
+  hours: number
+  minutes: number
+  seconds: number
+}
+
+export function CountdownTimer({ targetDate, className = "" }: CountdownTimerProps) {
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>({
     days: 0,
     hours: 0,
     minutes: 0,
@@ -31,26 +38,29 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
 
     calculateTimeLeft()
     const timer = setInterval(calculateTimeLeft, 1000)
+
     return () => clearInterval(timer)
   }, [targetDate])
 
+  const timeUnits = [
+    { label: "Dni", value: timeLeft.days },
+    { label: "Godzin", value: timeLeft.hours },
+    { label: "Minut", value: timeLeft.minutes },
+    { label: "Sekund", value: timeLeft.seconds },
+  ]
+
   return (
-    <div className="flex justify-center space-x-4 text-center">
-      {(["dni", "godzin", "minut", "sekund"] as const).map((label, i) => {
-        const value = Object.values(timeLeft)[i] as number
-        return (
-          <div
-            key={label}
-            className="glass-card border border-gold/10 rounded-md p-3 w-16 shadow-gold hover:shadow-gold-lg transition-all duration-300 card-3d"
-          >
-            <div className="text-gold text-xl font-mono font-semibold">{String(value).padStart(2, "0")}</div>
-            <div className="text-navy-light/60 text-xs">{label}</div>
+    <div className={`flex gap-2 md:gap-4 justify-center ${className}`}>
+      {timeUnits.map((unit, index) => (
+        <div key={unit.label} className="text-center">
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 md:p-3 border border-white/20">
+            <div className="text-xl md:text-3xl font-bold text-white tabular-nums">
+              {unit.value.toString().padStart(2, "0")}
+            </div>
+            <div className="text-xs md:text-sm text-white/80 mt-1">{unit.label}</div>
           </div>
-        )
-      })}
+        </div>
+      ))}
     </div>
   )
 }
-
-/* keep default export for existing imports */
-export default CountdownTimer

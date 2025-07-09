@@ -13,71 +13,64 @@ interface WebinarFormProps {
   simplified?: boolean
 }
 
-// Pomocnicza funkcja do zapisywania zgłoszeń lokalnie
-function saveSubmissionLocally(data: { name: string; email: string; phone: string }) {
-  try {
-    // Pobierz istniejące zgłoszenia lub utwórz pustą tablicę
-    const storedSubmissions = localStorage.getItem("webinarSubmissions")
-    const submissions = storedSubmissions ? JSON.parse(storedSubmissions) : []
-
-    // Dodaj nowe zgłoszenie z datą
-    submissions.push({
-      ...data,
-      submittedAt: new Date().toISOString(),
-      device: navigator.userAgent,
-    })
-
-    // Zapisz z powrotem do localStorage
-    localStorage.setItem("webinarSubmissions", JSON.stringify(submissions))
-
-    console.log("Client: Zgłoszenie zapisane lokalnie", data)
-    return true
-  } catch (error) {
-    console.error("Client: Błąd podczas zapisywania zgłoszenia lokalnie", error)
-    return false
-  }
-}
-
 // Funkcja do wysyłania danych do GetResponse
 async function sendToGetResponse(data: { name: string; email: string; phone: string }) {
   try {
     const apiKey = "wic2ysqcn4we1qmg9u2e8s67gd1v64c5"
-    const apiUrl = "https://api.getresponse.com/v3/contacts"
+    const webinarId = "VDWKD" // ID webinaru z URL
 
     console.log("Client: Wysyłanie do GetResponse API")
 
-    const response = await fetch(apiUrl, {
+    // Wysyłanie do GetResponse API
+    const response = await fetch(`https://api.getresponse.com/v3/webinars/${webinarId}/registrations`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Auth-Token": `api-key ${apiKey}`,
       },
       body: JSON.stringify({
-        name: data.name,
         email: data.email,
+        name: data.name,
         customFieldValues: [
           {
             customFieldId: "phone",
             value: [data.phone],
           },
         ],
-        campaign: {
-          campaignId: "Dubai-Invest",
-        },
-        tags: ["webinar-dubai", "nieruchomosci-dubai"],
-        note: `Zapisany na webinar: Jak skutecznie inwestować w nieruchomości w Dubaju? - 27 lipca 2025, 19:30`,
       }),
     })
 
     if (response.ok) {
-      console.log("Client: Dane wysłane pomyślnie do GetResponse")
+      console.log("Client: Pomyślnie wysłano do GetResponse")
       return true
     } else {
-      console.error("Client: Błąd GetResponse API:", response.status, response.statusText)
+      const errorData = await response.text()
+      console.error("Client: Błąd GetResponse API:", errorData)
       return false
     }
   } catch (error) {
     console.error("Client: Błąd podczas wysyłania do GetResponse:", error)
+    return false
+  }
+}
+
+// Pomocnicza funkcja do zapisywania zgłoszeń lokalnie
+function saveSubmissionLocally(data: { name: string; email: string; phone: string }) {
+  try {
+    const storedSubmissions = localStorage.getItem("webinarSubmissions")
+    const submissions = storedSubmissions ? JSON.parse(storedSubmissions) : []
+
+    submissions.push({
+      ...data,
+      submittedAt: new Date().toISOString(),
+      device: navigator.userAgent,
+    })
+
+    localStorage.setItem("webinarSubmissions", JSON.stringify(submissions))
+    console.log("Client: Zgłoszenie zapisane lokalnie", data)
+    return true
+  } catch (error) {
+    console.error("Client: Błąd podczas zapisywania zgłoszenia lokalnie", error)
     return false
   }
 }
@@ -109,15 +102,19 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
       // 1. Zapisz dane lokalnie jako backup
       saveSubmissionLocally(formData)
 
-      // 2. Spróbuj wysłać dane bezpośrednio do Google Apps Script
-      await sendToGetResponse(formData)
+      // 2. Spróbuj wysłać dane do GetResponse
+      const getResponseSuccess = await sendToGetResponse(formData)
 
-      // 3. Oznacz formularz jako wysłany
+      // 3. Oznacz formularz jako wysłany (niezależnie od wyniku API)
       setSubmitted(true)
-      console.log("Client: Formularz przetworzony pomyślnie")
+
+      if (getResponseSuccess) {
+        console.log("Client: Formularz wysłany pomyślnie do GetResponse")
+      } else {
+        console.log("Client: Formularz zapisany lokalnie, problem z GetResponse API")
+      }
     } catch (error) {
       console.error("Client: Błąd podczas wysyłania formularza:", error)
-
       // Nawet w przypadku błędu, pokazujemy użytkownikowi sukces
       setSubmitted(true)
     } finally {
@@ -133,7 +130,7 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
         <CardHeader className="pb-2 px-4 md:px-6">
           <div className="modern-badge inline-block mb-2 text-xs md:text-sm">
             <span className="designer-dot"></span>
-            Najbliższy webinar: 27 lipca 2025
+            Najbliższy webinar: 27 lipca 2025, godz. 19:30
           </div>
           <CardTitle
             className={`text-lg md:text-xl luxury-heading ${formStyle === "dark" ? "text-white" : "text-navy"}`}
@@ -141,7 +138,7 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
             <span className="gradient-text-premium">Zapisz się teraz</span> – liczba miejsc ograniczona
           </CardTitle>
           <CardDescription className={`text-sm ${formStyle === "dark" ? "text-gray-300/80" : "text-gray-500"}`}>
-            Dowiedz się, jak inwestować w nieruchomości w Dubaju bez wychodzenia z domu
+            Jak skutecznie inwestować w nieruchomości w Dubaju?
           </CardDescription>
         </CardHeader>
       )}

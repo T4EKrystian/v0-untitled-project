@@ -1,7 +1,7 @@
 "use client"
-import { Button } from "@/components/ui/button"
-import type React from "react"
 
+import type React from "react"
+import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { useState, useEffect } from "react"
 
@@ -14,6 +14,7 @@ export function FloatingCTA({ onClick }: FloatingCTAProps) {
   const [isDismissed, setIsDismissed] = useState(false)
 
   useEffect(() => {
+    // Show the floating CTA after scrolling down a bit
     const handleScroll = () => {
       if (window.scrollY > window.innerHeight && !isDismissed) {
         setIsVisible(true)
@@ -21,13 +22,12 @@ export function FloatingCTA({ onClick }: FloatingCTAProps) {
         setIsVisible(false)
       }
     }
+
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [isDismissed])
 
-  if (!isVisible) return null
-
-  return (
+  return isVisible ? (
     <div className="fixed bottom-4 right-4 left-4 md:bottom-8 md:right-8 md:left-auto z-50 animate-fade-in-up">
       <Button
         variant="modern"
@@ -39,8 +39,5 @@ export function FloatingCTA({ onClick }: FloatingCTAProps) {
         <ArrowRight className="ml-2 h-5 w-5 transition-all duration-300 group-hover:translate-x-1" />
       </Button>
     </div>
-  )
+  ) : null
 }
-
-/* retain default for backward-compat */
-export default FloatingCTA
