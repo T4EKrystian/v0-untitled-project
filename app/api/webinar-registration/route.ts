@@ -19,6 +19,43 @@ async function safeJsonParse(response: Response) {
   }
 }
 
+// Funkcja do sprawdzania dostępnych webinarów
+async function getAvailableWebinars(apiKey: string) {
+  try {
+    console.log("Server: Pobieranie listy webinarów...")
+    const response = await fetch("https://api.getresponse.com/v3/webinars", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Auth-Token": `api-key ${apiKey}`,
+      },
+    })
+
+    console.log("Server: Webinars list status:", response.status)
+
+    if (response.ok) {
+      const parseResult = await safeJsonParse(response)
+      if (parseResult.data && Array.isArray(parseResult.data)) {
+        console.log("Server: Found webinars:", parseResult.data.length)
+        parseResult.data.forEach((webinar, index) => {
+          console.log(`Server: Webinar ${index + 1}:`, {
+            id: webinar.webinarId,
+            name: webinar.name,
+            status: webinar.status,
+            startsOn: webinar.startsOn,
+            registrationEnabled: webinar.registrationEnabled,
+          })
+        })
+        return parseResult.data
+      }
+    }
+    return []
+  } catch (error) {
+    console.error("Server: Error getting webinars:", error)
+    return []
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -32,84 +69,102 @@ export async function POST(request: NextRequest) {
     const apiKey = "wic2ysqcn4we1qmg9u2e8s67gd1v64c5"
     console.log("Server: GetResponse API Key:", apiKey ? "USTAWIONY" : "BRAK")
 
-    // Znany webinar ID z URL
-    const knownWebinarId = "VDWKD"
-    console.log("Server: Próbuję użyć znanego webinar ID:", knownWebinarId)
+    // Najpierw sprawdź dostępne webinary
+    const availableWebinars = await getAvailableWebinars(apiKey)
 
-    // Próba bezpośredniej rejestracji z znanym ID
-    try {
-      console.log("Server: Próba bezpośredniej rejestracji na webinar...")
-      const registrationPayload = {
-        email: email,
-        name: name,
-      }
+    if (availableWebinars.length > 0) {
+      // Znajdź aktywny webinar z otwartymi rejestracjami
+      const activeWebinar = availableWebinars.find(
+        (webinar) => webinar.status === "published" && webinar.registrationEnabled === true,
+      )
 
-      console.log("Server: Registration payload:", registrationPayload)
+      if (activeWebinar) {
+        console.log("Server: Znaleziono aktywny webinar:", activeWebinar.webinarId)
 
-      const directResponse = await fetch(`https://api.getresponse.com/v3/webinars/${knownWebinarId}/registrations`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Auth-Token": `api-key ${apiKey}`,
-        },
-        body: JSON.stringify(registrationPayload),
-      })
+        try {
+          const registrationPayload = {
+            email: email,
+            name: name,
+          }
 
-      console.log("Server: Direct registration status:", directResponse.status)
-      console.log("Server: Direct registration headers:", Object.fromEntries(directResponse.headers.entries()))
+          console.log("Server: Rejestracja na webinar:", activeWebinar.webinarId)
 
-      if (directResponse.ok) {
-        const parseResult = await safeJsonParse(directResponse)
-
-        if (parseResult.isEmpty) {
-          console.log("Server: ✅ Webinar registration successful (empty response)")
-          return NextResponse.json({
-            success: true,
-            message: "Rejestracja na webinar zakończona pomyślnie! Sprawdź swoją skrzynkę email.",
-            debug: {
-              method: "webinar_registration_empty_response",
-              webinarId: knownWebinarId,
-              status: directResponse.status,
+          const webinarResponse = await fetch(
+            `https://api.getresponse.com/v3/webinars/${activeWebinar.webinarId}/registrations`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Auth-Token": `api-key ${apiKey}`,
+              },
+              body: JSON.stringify(registrationPayload),
             },
-          })
-        } else if (parseResult.data) {
-          console.log("Server: ✅ Webinar registration successful:", parseResult.data)
-          return NextResponse.json({
-            success: true,
-            data: parseResult.data,
-            message: "Rejestracja na webinar zakończona pomyślnie! Sprawdź swoją skrzynkę email.",
-            debug: {
-              method: "webinar_registration",
-              webinarId: knownWebinarId,
-              registrationId: parseResult.data.registrationId || parseResult.data.id,
-            },
-          })
-        } else {
-          console.log("Server: ⚠️ Webinar registration - parse error but status OK")
-          return NextResponse.json({
-            success: true,
-            message: "Rejestracja na webinar zakończona pomyślnie! Sprawdź swoją skrzynkę email.",
-            debug: {
-              method: "webinar_registration_parse_error",
-              webinarId: knownWebinarId,
-              parseError: parseResult.parseError,
-            },
-          })
+          )
+
+          console.log("Server: Webinar registration status:", webinarResponse.status)
+
+          if (webinarResponse.ok) {
+            const parseResult = await safeJsonParse(webinarResponse)
+            console.log("Server: ✅ Webinar registration successful!")
+
+            return NextResponse.json({
+              success: true,
+              data: parseResult.data,
+              message:
+                "Rejestracja na webinar zakończona pomyślnie! Sprawdź swoją skrzynkę email z informacjami o webinarze.",
+              debug: {
+                method: "webinar_registration_success",
+                webinarId: activeWebinar.webinarId,
+                webinarName: activeWebinar.name,
+                registrationId: parseResult.data?.registrationId || parseResult.data?.id,
+              },
+            })
+          } else {
+            const parseResult = await safeJsonParse(webinarResponse)
+            console.log("Server: ❌ Webinar registration failed:", parseResult)
+
+            // Sprawdź czy to błąd duplikatu
+            if (
+              parseResult.data &&
+              (parseResult.data.code === 1008 ||
+                (typeof parseResult.data === "string" && parseResult.data.includes("already registered")))
+            ) {
+              return NextResponse.json({
+                success: true,
+                message: "Jesteś już zarejestrowany na ten webinar! Sprawdź swoją skrzynkę email.",
+                debug: {
+                  method: "webinar_already_registered",
+                  webinarId: activeWebinar.webinarId,
+                },
+              })
+            }
+          }
+        } catch (webinarError) {
+          console.error("Server: ❌ Webinar registration exception:", webinarError)
         }
       } else {
-        const parseResult = await safeJsonParse(directResponse)
-        console.log("Server: ❌ Direct webinar registration failed:", parseResult)
+        console.log("Server: ⚠️ Brak aktywnych webinarów z otwartymi rejestracjami")
+
+        // Pokaż wszystkie webinary dla debugowania
+        availableWebinars.forEach((webinar) => {
+          console.log("Server: Webinar details:", {
+            id: webinar.webinarId,
+            name: webinar.name,
+            status: webinar.status,
+            registrationEnabled: webinar.registrationEnabled,
+            startsOn: webinar.startsOn,
+          })
+        })
       }
-    } catch (directError) {
-      console.error("Server: ❌ Direct registration exception:", directError)
+    } else {
+      console.log("Server: ⚠️ Brak dostępnych webinarów")
     }
 
-    // Fallback - zarządzanie kontaktem
-    console.log("Server: Fallback - zarządzanie kontaktem...")
+    // Fallback - dodaj do listy kontaktów
+    console.log("Server: Fallback - dodawanie do listy kontaktów...")
 
     try {
       // Sprawdź czy kontakt już istnieje
-      console.log("Server: Sprawdzanie czy kontakt istnieje...")
       const searchResponse = await fetch(
         `https://api.getresponse.com/v3/contacts?query[email]=${encodeURIComponent(email)}`,
         {
@@ -121,8 +176,6 @@ export async function POST(request: NextRequest) {
         },
       )
 
-      console.log("Server: Search response status:", searchResponse.status)
-
       if (searchResponse.ok) {
         const searchParseResult = await safeJsonParse(searchResponse)
 
@@ -131,28 +184,25 @@ export async function POST(request: NextRequest) {
           console.log("Server: Existing contacts found:", existingContacts.length)
 
           if (existingContacts.length > 0) {
-            // Kontakt już istnieje
             const existingContact = existingContacts[0]
             console.log("Server: ✅ Contact already exists:", existingContact.contactId)
 
             return NextResponse.json({
               success: true,
               data: existingContact,
-              message: "Dziękujemy za zainteresowanie! Jesteś już w naszej bazie kontaktów.",
+              message: "Dodano Cię do listy kontaktów. Skontaktujemy się z Tobą w sprawie webinaru.",
               debug: {
-                method: "contact_exists",
+                method: "contact_exists_no_webinar",
                 contactId: existingContact.contactId,
-                wasExisting: true,
+                availableWebinars: availableWebinars.length,
+                webinarIssue: "No active webinars with open registration",
               },
             })
           }
         }
       }
 
-      // Jeśli kontakt nie istnieje, dodaj go
-      console.log("Server: Dodawanie nowego kontaktu...")
-
-      // Pobierz listy
+      // Dodaj nowy kontakt
       const listsResponse = await fetch("https://api.getresponse.com/v3/campaigns", {
         method: "GET",
         headers: {
@@ -160,8 +210,6 @@ export async function POST(request: NextRequest) {
           "X-Auth-Token": `api-key ${apiKey}`,
         },
       })
-
-      console.log("Server: Lists response status:", listsResponse.status)
 
       if (listsResponse.ok) {
         const listsParseResult = await safeJsonParse(listsResponse)
@@ -178,9 +226,14 @@ export async function POST(request: NextRequest) {
               email: email,
               name: name,
               campaign: { campaignId: listId },
+              // Dodaj custom field wskazujący zainteresowanie webinarem
+              customFieldValues: [
+                {
+                  customFieldId: "webinar_interest",
+                  value: ["true"],
+                },
+              ],
             }
-
-            console.log("Server: New contact payload:", contactPayload)
 
             const contactResponse = await fetch("https://api.getresponse.com/v3/contacts", {
               method: "POST",
@@ -191,127 +244,45 @@ export async function POST(request: NextRequest) {
               body: JSON.stringify(contactPayload),
             })
 
-            console.log("Server: New contact response status:", contactResponse.status)
-
             if (contactResponse.ok) {
               const contactParseResult = await safeJsonParse(contactResponse)
+              console.log("Server: ✅ New contact added to list")
 
-              if (contactParseResult.isEmpty) {
-                console.log("Server: ✅ Contact added (empty response)")
-                return NextResponse.json({
-                  success: true,
-                  message: "Rejestracja zakończona pomyślnie! Skontaktujemy się z Tobą wkrótce.",
-                  debug: {
-                    method: "new_contact_empty_response",
-                    listId: listId,
-                  },
-                })
-              } else if (contactParseResult.data) {
-                console.log("Server: ✅ New contact added:", contactParseResult.data)
-                return NextResponse.json({
-                  success: true,
-                  data: contactParseResult.data,
-                  message: "Rejestracja zakończona pomyślnie! Skontaktujemy się z Tobą wkrótce.",
-                  debug: {
-                    method: "new_contact",
-                    listId: listId,
-                    contactId: contactParseResult.data.contactId,
-                  },
-                })
-              } else {
-                console.log("Server: ⚠️ Contact added but parse error")
-                return NextResponse.json({
-                  success: true,
-                  message: "Rejestracja zakończona pomyślnie! Skontaktujemy się z Tobą wkrótce.",
-                  debug: {
-                    method: "new_contact_parse_error",
-                    listId: listId,
-                    parseError: contactParseResult.parseError,
-                  },
-                })
-              }
-            } else {
-              const contactParseResult = await safeJsonParse(contactResponse)
-              console.error("Server: ❌ New contact error:", contactParseResult)
-
-              // Sprawdź czy to błąd duplikatu
-              if (
-                contactParseResult.data &&
-                (contactParseResult.data.code === 1008 ||
-                  (typeof contactParseResult.data === "string" &&
-                    contactParseResult.data.includes("Contact already added")))
-              ) {
-                return NextResponse.json({
-                  success: true,
-                  message: "Dziękujemy za zainteresowanie! Jesteś już w naszej bazie kontaktów.",
-                  debug: {
-                    method: "duplicate_detected",
-                    error: "Contact already exists",
-                  },
-                })
-              }
-
-              return NextResponse.json(
-                {
-                  success: false,
-                  message: "Błąd podczas dodawania kontaktu",
-                  error: contactParseResult.parseError || "Unknown error",
-                  debug: {
-                    method: "contact_failed",
-                    error: contactParseResult.parseError,
-                    rawData: contactParseResult.data,
-                  },
+              return NextResponse.json({
+                success: true,
+                data: contactParseResult.data,
+                message: "Dodano Cię do listy kontaktów. Skontaktujemy się z Tobą w sprawie webinaru.",
+                debug: {
+                  method: "new_contact_no_webinar",
+                  listId: listId,
+                  contactId: contactParseResult.data?.contactId,
+                  availableWebinars: availableWebinars.length,
+                  webinarIssue: "No active webinars with open registration",
                 },
-                { status: 500 },
-              )
+              })
             }
-          } else {
-            console.log("Server: ❌ No lists available")
-            return NextResponse.json(
-              {
-                success: false,
-                message: "Brak dostępnych list kontaktów",
-                error: "No campaigns found",
-                debug: { method: "no_lists" },
-              },
-              { status: 500 },
-            )
           }
-        } else {
-          console.log("Server: ❌ Lists parse error")
-          return NextResponse.json(
-            {
-              success: false,
-              message: "Błąd podczas pobierania list kontaktów",
-              error: "Parse error",
-              debug: { method: "lists_parse_failed", parseError: listsParseResult.parseError },
-            },
-            { status: 500 },
-          )
         }
-      } else {
-        const listsParseResult = await safeJsonParse(listsResponse)
-        console.error("Server: ❌ Lists request failed:", listsParseResult)
-
-        return NextResponse.json(
-          {
-            success: false,
-            message: "Błąd podczas pobierania list kontaktów",
-            error: listsParseResult.parseError || "Request failed",
-            debug: { method: "lists_request_failed", error: listsParseResult.parseError },
-          },
-          { status: 500 },
-        )
       }
-    } catch (listError) {
-      console.error("Server: ❌ Contact management exception:", listError)
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Nie udało się dodać do listy kontaktów",
+          error: "Contact creation failed",
+          debug: { method: "contact_creation_failed" },
+        },
+        { status: 500 },
+      )
+    } catch (contactError) {
+      console.error("Server: ❌ Contact management exception:", contactError)
 
       return NextResponse.json(
         {
           success: false,
           message: "Błąd podczas zarządzania kontaktem",
-          error: listError.message,
-          debug: { method: "contact_exception", error: listError.message },
+          error: contactError.message,
+          debug: { method: "contact_exception", error: contactError.message },
         },
         { status: 500 },
       )
