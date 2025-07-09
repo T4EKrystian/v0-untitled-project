@@ -216,7 +216,11 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className={`premium-input h-10 md:h-11 text-base ${formStyle === "dark" ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-400" : "bg-white text-navy border-gold/10 placeholder-gray-500"} hover:border-gold/40 focus:border-gold/50 transition-colors`}
+                  className={`premium-input h-10 md:h-11 text-base ${
+                    formStyle === "dark"
+                      ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-300"
+                      : "bg-white text-gray-900 border-gold/10 placeholder-gray-500"
+                  } hover:border-gold/40 focus:border-gold/50 transition-colors`}
                 />
               </div>
               <div>
@@ -227,7 +231,11 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className={`premium-input h-10 md:h-11 text-base ${formStyle === "dark" ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-400" : "bg-white text-navy border-gold/10 placeholder-gray-500"} hover:border-gold/40 focus:border-gold/50 transition-colors`}
+                  className={`premium-input h-10 md:h-11 text-base ${
+                    formStyle === "dark"
+                      ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-300"
+                      : "bg-white text-gray-900 border-gold/10 placeholder-gray-500"
+                  } hover:border-gold/40 focus:border-gold/50 transition-colors`}
                 />
               </div>
               <div>
@@ -238,7 +246,11 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`premium-input h-10 md:h-11 text-base ${formStyle === "dark" ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-400" : "bg-white text-navy border-gold/10 placeholder-gray-500"} hover:border-gold/40 focus:border-gold/50 transition-colors`}
+                  className={`premium-input h-10 md:h-11 text-base ${
+                    formStyle === "dark"
+                      ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-300"
+                      : "bg-white text-gray-900 border-gold/10 placeholder-gray-500"
+                  } hover:border-gold/40 focus:border-gold/50 transition-colors`}
                 />
               </div>
             </div>
