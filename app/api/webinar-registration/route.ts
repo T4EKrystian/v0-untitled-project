@@ -9,43 +9,7 @@ export async function POST(request: NextRequest) {
     console.log("Server: Otrzymane dane:", { name, email, phone })
     console.log("Server: Timestamp:", new Date().toISOString())
 
-    // Najpierw spróbuj wysłać do Google Apps Script (jako backup)
-    const googleScriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL
-    console.log("Server: Google Apps Script URL:", googleScriptUrl ? "USTAWIONY" : "BRAK")
-
-    if (googleScriptUrl) {
-      try {
-        console.log("Server: Wysyłanie do Google Apps Script...")
-        const googleResponse = await fetch(googleScriptUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            phone,
-            timestamp: new Date().toISOString(),
-            source: "webinar-form",
-          }),
-        })
-
-        console.log("Server: Google Apps Script status:", googleResponse.status)
-
-        if (googleResponse.ok) {
-          const googleResult = await googleResponse.text()
-          console.log("Server: Google Apps Script response:", googleResult)
-          console.log("Server: ✅ Pomyślnie wysłano do Google Apps Script")
-        } else {
-          const googleError = await googleResponse.text()
-          console.log("Server: ❌ Błąd Google Apps Script:", googleError)
-        }
-      } catch (googleError) {
-        console.error("Server: ❌ Wyjątek Google Apps Script:", googleError)
-      }
-    }
-
-    // Następnie spróbuj GetResponse
+    // GetResponse API
     const apiKey = "wic2ysqcn4we1qmg9u2e8s67gd1v64c5"
     console.log("Server: GetResponse API Key:", apiKey ? "USTAWIONY" : "BRAK")
 
@@ -68,9 +32,27 @@ export async function POST(request: NextRequest) {
       } else {
         const accountError = await accountResponse.text()
         console.log("Server: ❌ GetResponse account error:", accountError)
+
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Błąd połączenia z systemem rejestracji",
+            error: "Invalid API credentials",
+          },
+          { status: 400 },
+        )
       }
     } catch (accountError) {
       console.error("Server: ❌ GetResponse account exception:", accountError)
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Błąd połączenia z systemem rejestracji",
+          error: "Connection failed",
+        },
+        { status: 500 },
+      )
     }
 
     // Sprawdź dostępne webinary
@@ -127,73 +109,91 @@ export async function POST(request: NextRequest) {
               data: result,
               message: "Rejestracja zakończona pomyślnie! Sprawdź swoją skrzynkę email.",
               debug: {
-                googleScript: googleScriptUrl ? "sent" : "not_configured",
                 getResponse: "success",
                 webinarId: webinarId,
+                registrationId: result.registrationId || result.id,
               },
             })
           } else {
             const errorData = await registrationResponse.text()
             console.error("Server: ❌ Błąd rejestracji GetResponse:", errorData)
 
-            return NextResponse.json({
-              success: true,
-              message: "Rejestracja została przyjęta! Skontaktujemy się z Tobą wkrótce.",
-              debug: {
-                googleScript: googleScriptUrl ? "sent" : "not_configured",
-                getResponse: "failed",
+            return NextResponse.json(
+              {
+                success: false,
+                message: "Błąd podczas rejestracji",
                 error: errorData,
+                debug: {
+                  getResponse: "registration_failed",
+                  webinarId: webinarId,
+                  error: errorData,
+                },
               },
-            })
+              { status: 400 },
+            )
           }
         } else {
           console.log("Server: ❌ Brak dostępnych webinarów")
-          return NextResponse.json({
-            success: true,
-            message: "Rejestracja została przyjęta! Skontaktujemy się z Tobą wkrótce.",
-            debug: {
-              googleScript: googleScriptUrl ? "sent" : "not_configured",
-              getResponse: "no_webinars",
+
+          return NextResponse.json(
+            {
+              success: false,
+              message: "Brak dostępnych webinarów",
+              error: "No webinars available",
+              debug: {
+                getResponse: "no_webinars",
+              },
             },
-          })
+            { status: 404 },
+          )
         }
       } else {
         const webinarsError = await webinarsResponse.text()
         console.error("Server: ❌ Błąd pobierania webinarów:", webinarsError)
 
-        return NextResponse.json({
-          success: true,
-          message: "Rejestracja została przyjęta! Skontaktujemy się z Tobą wkrótce.",
-          debug: {
-            googleScript: googleScriptUrl ? "sent" : "not_configured",
-            getResponse: "webinars_error",
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Błąd pobierania webinarów",
             error: webinarsError,
+            debug: {
+              getResponse: "webinars_error",
+              error: webinarsError,
+            },
           },
-        })
+          { status: 400 },
+        )
       }
     } catch (webinarsError) {
       console.error("Server: ❌ Wyjątek webinars:", webinarsError)
 
-      return NextResponse.json({
-        success: true,
-        message: "Rejestracja została przyjęta! Skontaktujemy się z Tobą wkrótce.",
-        debug: {
-          googleScript: googleScriptUrl ? "sent" : "not_configured",
-          getResponse: "exception",
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Błąd połączenia z systemem webinarów",
           error: webinarsError.message,
+          debug: {
+            getResponse: "exception",
+            error: webinarsError.message,
+          },
         },
-      })
+        { status: 500 },
+      )
     }
   } catch (error) {
     console.error("Server: ❌ Ogólny błąd:", error)
 
-    return NextResponse.json({
-      success: true,
-      message: "Rejestracja została przyjęta! Dziękujemy za zainteresowanie.",
-      debug: {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Wystąpił nieoczekiwany błąd",
         error: error.message,
-        timestamp: new Date().toISOString(),
+        debug: {
+          error: error.message,
+          timestamp: new Date().toISOString(),
+        },
       },
-    })
+      { status: 500 },
+    )
   }
 }

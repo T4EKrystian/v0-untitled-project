@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LimitedSpotsCounter } from "./limited-spots-counter"
-import { Loader2, CheckCircle } from "lucide-react"
+import { Loader2, CheckCircle, AlertCircle } from "lucide-react"
 
 interface WebinarFormProps {
   formStyle?: "light" | "dark"
@@ -35,48 +35,15 @@ async function sendToWebinarAPI(data: { name: string; email: string; phone: stri
       return { success: true, message: result.message, debug: result.debug }
     } else {
       console.error("Client: Błąd API route:", result)
-      return { success: false, error: result.error }
+      return { success: false, error: result.error || result.message, debug: result.debug }
     }
   } catch (error) {
     console.error("Client: Błąd podczas wysyłania przez API route:", error)
-    return { success: false, error: "Błąd połączenia" }
+    return { success: false, error: "Błąd połączenia z serwerem" }
   }
 }
 
-// Funkcja do wysyłania bezpośrednio do Google Apps Script jako fallback
-async function sendToGoogleScript(data: { name: string; email: string; phone: string }) {
-  try {
-    console.log("Client: Wysyłanie do Google Apps Script")
-
-    // Użyj zmiennej środowiskowej lub URL z konfiguracji
-    const googleScriptUrl =
-      process.env.NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL ||
-      "https://script.google.com/macros/s/AKfycbwYourScriptIdHere/exec"
-
-    const response = await fetch(googleScriptUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...data,
-        timestamp: new Date().toISOString(),
-        source: "webinar-form-fallback",
-      }),
-    })
-
-    if (response.ok) {
-      console.log("Client: Pomyślnie wysłano do Google Apps Script")
-      return true
-    }
-    return false
-  } catch (error) {
-    console.error("Client: Błąd Google Apps Script:", error)
-    return false
-  }
-}
-
-// Pomocnicza funkcja do zapisywania zgłoszeń lokalnie
+// Pomocnicza funkcja do zapisywania zgłoszeń lokalnie (jako backup)
 function saveSubmissionLocally(data: { name: string; email: string; phone: string }) {
   try {
     const storedSubmissions = localStorage.getItem("webinarSubmissions")
@@ -89,7 +56,7 @@ function saveSubmissionLocally(data: { name: string; email: string; phone: strin
     })
 
     localStorage.setItem("webinarSubmissions", JSON.stringify(submissions))
-    console.log("Client: Zgłoszenie zapisane lokalnie", data)
+    console.log("Client: Zgłoszenie zapisane lokalnie jako backup", data)
     return true
   } catch (error) {
     console.error("Client: Błąd podczas zapisywania zgłoszenia lokalnie", error)
@@ -101,6 +68,7 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
+  const [submitError, setSubmitError] = useState("")
   const [debugInfo, setDebugInfo] = useState<any>(null)
 
   // Stan dla pól formularza
@@ -119,14 +87,15 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setSubmitError("")
 
     console.log("Client: Rozpoczęcie wysyłania formularza")
 
     try {
-      // 1. Zapisz dane lokalnie jako backup
+      // Zapisz dane lokalnie jako backup
       saveSubmissionLocally(formData)
 
-      // 2. Spróbuj wysłać dane przez API route
+      // Wyślij dane przez API route do GetResponse
       const apiResult = await sendToWebinarAPI(formData)
 
       if (apiResult.success) {
@@ -135,25 +104,24 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
         setSubmitted(true)
         console.log("Client: Formularz wysłany pomyślnie")
       } else {
-        // 3. Jeśli API route nie działa, spróbuj Google Apps Script
-        console.log("Client: API route nie działa, próbuję Google Apps Script")
-        const googleResult = await sendToGoogleScript(formData)
-
-        if (googleResult) {
-          setSubmitMessage("Rejestracja została przyjęta! Skontaktujemy się z Tobą wkrótce.")
-        } else {
-          setSubmitMessage("Rejestracja została zapisana lokalnie. Skontaktujemy się z Tobą wkrótce.")
-        }
-        setSubmitted(true)
+        setSubmitError(apiResult.error || "Wystąpił błąd podczas rejestracji")
+        setDebugInfo(apiResult.debug)
+        console.error("Client: Błąd podczas wysyłania formularza:", apiResult.error)
       }
     } catch (error) {
-      console.error("Client: Błąd podczas wysyłania formularza:", error)
-      // Nawet w przypadku błędu, pokazujemy użytkownikowi sukces
-      setSubmitMessage("Rejestracja została przyjęta! Dziękujemy za zainteresowanie.")
-      setSubmitted(true)
+      console.error("Client: Nieoczekiwany błąd:", error)
+      setSubmitError("Wystąpił nieoczekiwany błąd. Spróbuj ponownie.")
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const resetForm = () => {
+    setSubmitted(false)
+    setSubmitError("")
+    setSubmitMessage("")
+    setDebugInfo(null)
+    setFormData({ name: "", email: "", phone: "" })
   }
 
   return (
@@ -215,9 +183,31 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
                 <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
               </div>
             )}
+
+            <Button variant="outline" size="sm" onClick={resetForm} className="mt-4 bg-transparent">
+              Zarejestruj kolejną osobę
+            </Button>
           </div>
         ) : (
           <form className="grid gap-3 md:gap-4" onSubmit={handleSubmit}>
+            {submitError && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-red-800 font-medium">Błąd rejestracji</p>
+                    <p className="text-red-600 text-sm">{submitError}</p>
+                    {debugInfo && process.env.NODE_ENV === "development" && (
+                      <details className="mt-2">
+                        <summary className="text-xs text-red-500 cursor-pointer">Debug info</summary>
+                        <pre className="text-xs mt-1 bg-red-100 p-2 rounded">{JSON.stringify(debugInfo, null, 2)}</pre>
+                      </details>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 gap-3 md:gap-4">
               <div>
                 <Input
