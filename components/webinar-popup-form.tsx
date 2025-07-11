@@ -1,54 +1,20 @@
 "use client"
-
-import { useState, useEffect } from "react"
 import { X, Calendar, Clock, Users } from "lucide-react"
 import { WebinarForm } from "./webinar-form"
 
-export function WebinarPopupForm() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [hasShown, setHasShown] = useState(false)
+interface WebinarPopupFormProps {
+  isOpen: boolean
+  onClose: () => void
+}
 
-  useEffect(() => {
-    // Sprawdź czy popup już był pokazany w tej sesji
-    const popupShown = sessionStorage.getItem("webinarPopupShown")
-    if (popupShown) {
-      setHasShown(true)
-      return
-    }
-
-    // Pokaż popup po 30 sekundach
-    const timer = setTimeout(() => {
-      if (!hasShown) {
-        setIsVisible(true)
-        setHasShown(true)
-        sessionStorage.setItem("webinarPopupShown", "true")
-      }
-    }, 30000)
-
-    return () => clearTimeout(timer)
-  }, [hasShown])
-
-  // Pokaż popup przy próbie opuszczenia strony
-  useEffect(() => {
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0 && !hasShown) {
-        setIsVisible(true)
-        setHasShown(true)
-        sessionStorage.setItem("webinarPopupShown", "true")
-      }
-    }
-
-    document.addEventListener("mouseleave", handleMouseLeave)
-    return () => document.removeEventListener("mouseleave", handleMouseLeave)
-  }, [hasShown])
-
-  if (!isVisible) return null
+export function WebinarPopupForm({ isOpen, onClose }: WebinarPopupFormProps) {
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <button
-          onClick={() => setIsVisible(false)}
+          onClick={onClose}
           className="absolute top-4 right-4 z-10 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
         >
           <X className="w-5 h-5" />

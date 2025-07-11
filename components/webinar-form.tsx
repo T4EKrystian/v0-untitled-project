@@ -216,11 +216,14 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className={`premium-input h-10 md:h-11 text-base ${
+                  className={`h-10 md:h-11 text-base transition-colors ${
                     formStyle === "dark"
-                      ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-300"
-                      : "bg-white text-gray-900 border-gold/10 placeholder-gray-500"
-                  } hover:border-gold/40 focus:border-gold/50 transition-colors`}
+                      ? "bg-navy-700/50 text-white border-gold/20 placeholder:text-gray-300/70 focus:border-gold/50"
+                      : "bg-white text-gray-900 border-gold/10 placeholder:text-gray-500/70 focus:border-gold/50"
+                  }`}
+                  style={{
+                    color: formStyle === "dark" ? "#ffffff" : "#111827",
+                  }}
                 />
               </div>
               <div>
@@ -231,26 +234,32 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className={`premium-input h-10 md:h-11 text-base ${
+                  className={`h-10 md:h-11 text-base transition-colors ${
                     formStyle === "dark"
-                      ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-300"
-                      : "bg-white text-gray-900 border-gold/10 placeholder-gray-500"
-                  } hover:border-gold/40 focus:border-gold/50 transition-colors`}
+                      ? "bg-navy-700/50 text-white border-gold/20 placeholder:text-gray-300/70 focus:border-gold/50"
+                      : "bg-white text-gray-900 border-gold/10 placeholder:text-gray-500/70 focus:border-gold/50"
+                  }`}
+                  style={{
+                    color: formStyle === "dark" ? "#ffffff" : "#111827",
+                  }}
                 />
               </div>
               <div>
                 <Input
                   name="phone"
-                  placeholder="Telefon"
+                  placeholder="Telefon (np. 123456789)"
                   type="tel"
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`premium-input h-10 md:h-11 text-base ${
+                  className={`h-10 md:h-11 text-base transition-colors ${
                     formStyle === "dark"
-                      ? "bg-navy-700/50 text-white border-gold/20 placeholder-gray-300"
-                      : "bg-white text-gray-900 border-gold/10 placeholder-gray-500"
-                  } hover:border-gold/40 focus:border-gold/50 transition-colors`}
+                      ? "bg-navy-700/50 text-white border-gold/20 placeholder:text-gray-300/70 focus:border-gold/50"
+                      : "bg-white text-gray-900 border-gold/10 placeholder:text-gray-500/70 focus:border-gold/50"
+                  }`}
+                  style={{
+                    color: formStyle === "dark" ? "#ffffff" : "#111827",
+                  }}
                 />
               </div>
             </div>

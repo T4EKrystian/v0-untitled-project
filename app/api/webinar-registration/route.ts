@@ -19,6 +19,49 @@ async function safeJsonParse(response: Response) {
   }
 }
 
+// Funkcja do formatowania numeru telefonu - spróbujmy różnych formatów
+function formatPhoneNumber(phone: string): string[] {
+  // Usuń wszystkie znaki niebędące cyframi
+  const cleanPhone = phone.replace(/\D/g, "")
+
+  const formats = []
+
+  // Format 1: +48 xxx xxx xxx (z spacjami)
+  if (cleanPhone.length === 9) {
+    const formatted = `+48 ${cleanPhone.substring(0, 3)} ${cleanPhone.substring(3, 6)} ${cleanPhone.substring(6)}`
+    formats.push(formatted)
+  }
+
+  // Format 2: +48xxxxxxxxx (bez spacji)
+  if (cleanPhone.length === 9) {
+    formats.push(`+48${cleanPhone}`)
+  }
+
+  // Format 3: 48xxxxxxxxx (bez plusa)
+  if (cleanPhone.length === 9) {
+    formats.push(`48${cleanPhone}`)
+  }
+
+  // Format 4: xxxxxxxxx (tylko cyfry)
+  if (cleanPhone.length === 9) {
+    formats.push(cleanPhone)
+  }
+
+  // Format 5: xxx-xxx-xxx (z myślnikami)
+  if (cleanPhone.length === 9) {
+    const formatted = `${cleanPhone.substring(0, 3)}-${cleanPhone.substring(3, 6)}-${cleanPhone.substring(6)}`
+    formats.push(formatted)
+  }
+
+  // Format 6: (xxx) xxx-xxx (z nawiasami)
+  if (cleanPhone.length === 9) {
+    const formatted = `(${cleanPhone.substring(0, 3)}) ${cleanPhone.substring(3, 6)}-${cleanPhone.substring(6)}`
+    formats.push(formatted)
+  }
+
+  return formats
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -27,6 +70,11 @@ export async function POST(request: NextRequest) {
     console.log("=== WEBINAR REGISTRATION DEBUG ===")
     console.log("Server: Otrzymane dane:", { name, email, phone })
     console.log("Server: Timestamp:", new Date().toISOString())
+
+    // Przygotuj różne formaty numeru telefonu
+    const phoneFormats = formatPhoneNumber(phone)
+    console.log("Server: Original phone:", phone)
+    console.log("Server: Phone formats to try:", phoneFormats)
 
     // GetResponse API
     const apiKey = "wic2ysqcn4we1qmg9u2e8s67gd1v64c5"
@@ -120,10 +168,10 @@ export async function POST(request: NextRequest) {
     }
 
     // KROK 2: Fallback - dodaj do listy kontaktów "wojciech"
-    console.log("Server: KROK 2 - Dodawanie do listy kontaktów 'wojciech'...")
+    console.log("Server: KROK 2 - Dodawanie do listy kontaktów...")
 
     try {
-      // Najpierw pobierz listy i znajdź "wojciech"
+      // Najpierw pobierz listy
       console.log("Server: Pobieranie list kontaktów...")
       const listsResponse = await fetch("https://api.getresponse.com/v3/campaigns", {
         method: "GET",
@@ -151,26 +199,8 @@ export async function POST(request: NextRequest) {
       const lists = listsParseResult.data
       console.log("Server: Available lists:", lists.length)
 
-      // Loguj wszystkie dostępne listy
-      lists.forEach((list, index) => {
-        console.log(`Server: List ${index + 1}:`, {
-          id: list.campaignId,
-          name: list.name,
-        })
-      })
-
-      // Znajdź listę "wojciech"
-      const wojciechList = lists.find((list) => list.name.toLowerCase().includes("wojciech"))
-
-      if (!wojciechList) {
-        console.log("Server: ⚠️ Nie znaleziono listy 'wojciech', używam pierwszej dostępnej")
-        if (lists.length === 0) {
-          throw new Error("No campaigns/lists available")
-        }
-      }
-
-      const listId = wojciechList ? wojciechList.campaignId : lists[0].campaignId
-      const listName = wojciechList ? wojciechList.name : lists[0].name
+      const listId = lists[0].campaignId
+      const listName = lists[0].name
       console.log("Server: Using list:", { id: listId, name: listName })
 
       // Sprawdź czy kontakt już istnieje
@@ -195,36 +225,6 @@ export async function POST(request: NextRequest) {
           const existingContact = searchParseResult.data[0]
           console.log("Server: ✅ Contact already exists:", existingContact.contactId)
 
-          // Spróbuj zaktualizować istniejący kontakt z numerem telefonu
-          try {
-            const updatePayload = {
-              name: name,
-              customFieldValues: [
-                {
-                  customFieldId: "phone", // lub inny ID dla telefonu
-                  value: [phone],
-                },
-              ],
-            }
-
-            const updateResponse = await fetch(`https://api.getresponse.com/v3/contacts/${existingContact.contactId}`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Auth-Token": `api-key ${apiKey}`,
-              },
-              body: JSON.stringify(updatePayload),
-            })
-
-            console.log("Server: Contact update status:", updateResponse.status)
-
-            if (updateResponse.ok) {
-              console.log("Server: ✅ Contact updated with phone number")
-            }
-          } catch (updateError) {
-            console.log("Server: ⚠️ Could not update contact with phone:", updateError)
-          }
-
           return NextResponse.json({
             success: true,
             data: existingContact,
@@ -233,60 +233,133 @@ export async function POST(request: NextRequest) {
               method: "contact_exists",
               contactId: existingContact.contactId,
               listUsed: listName,
+              phoneFormats: phoneFormats,
             },
           })
         }
       }
 
-      // Dodaj nowy kontakt z numerem telefonu
-      console.log("Server: Dodawanie nowego kontaktu z numerem telefonu...")
-      const contactPayload = {
-        email: email,
-        name: name,
-        campaign: { campaignId: listId },
-        customFieldValues: [
-          {
-            customFieldId: "phone",
-            value: [phone],
-          },
-        ],
-      }
-
-      console.log("Server: Contact payload:", contactPayload)
-
-      const contactResponse = await fetch("https://api.getresponse.com/v3/contacts", {
-        method: "POST",
+      // Pobierz custom fields przed dodaniem nowego kontaktu
+      console.log("Server: Pobieranie custom fields dla nowego kontaktu...")
+      const customFieldsResponse = await fetch("https://api.getresponse.com/v3/custom-fields", {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           "X-Auth-Token": `api-key ${apiKey}`,
         },
-        body: JSON.stringify(contactPayload),
       })
 
-      console.log("Server: Contact creation status:", contactResponse.status)
+      let phoneFields = []
+      if (customFieldsResponse.ok) {
+        const customFieldsResult = await safeJsonParse(customFieldsResponse)
+        console.log("Server: Custom fields available:", customFieldsResult.data?.length || 0)
 
-      if (contactResponse.ok) {
-        const contactParseResult = await safeJsonParse(contactResponse)
-        console.log("Server: ✅ NEW CONTACT ADDED WITH PHONE!")
+        if (customFieldsResult.data && Array.isArray(customFieldsResult.data)) {
+          // Znajdź wszystkie pola telefonu
+          phoneFields = customFieldsResult.data.filter((field) => {
+            const fieldName = field.name.toLowerCase()
+            return (
+              fieldName.includes("phone") ||
+              fieldName.includes("telefon") ||
+              fieldName.includes("tel") ||
+              fieldName.includes("mobile") ||
+              field.type === "phone" ||
+              field.valueType === "phone"
+            )
+          })
 
-        return NextResponse.json({
-          success: true,
-          data: contactParseResult.data,
-          message: "Dodano Cię do listy kontaktów. Skontaktujemy się z Tobą w sprawie webinaru.",
-          debug: {
-            method: "new_contact_added_with_phone",
-            listId: listId,
-            listName: listName,
-            contactId: contactParseResult.data?.contactId,
-            phoneIncluded: true,
-          },
-        })
-      } else {
-        const contactErrorResult = await safeJsonParse(contactResponse)
-        console.error("Server: ❌ Contact creation failed:", contactErrorResult)
+          console.log("Server: Found phone fields:", phoneFields.length)
+          phoneFields.forEach((field, index) => {
+            console.log(`Server: Phone field ${index + 1}:`, {
+              id: field.customFieldId,
+              name: field.name,
+              type: field.type,
+              fieldType: field.fieldType,
+              valueType: field.valueType,
+            })
+          })
+        }
+      }
 
-        // Jeśli nie udało się z custom field, spróbuj bez telefonu
-        console.log("Server: Próba dodania kontaktu bez custom field telefonu...")
+      // Spróbuj dodać kontakt z różnymi formatami telefonu
+      let contactCreated = false
+      let lastError = null
+
+      for (let i = 0; i < phoneFormats.length && !contactCreated; i++) {
+        const currentPhoneFormat = phoneFormats[i]
+        console.log(`Server: Próba ${i + 1}/${phoneFormats.length} z formatem telefonu: "${currentPhoneFormat}"`)
+
+        // Spróbuj z każdym polem telefonu
+        for (let j = 0; j < phoneFields.length && !contactCreated; j++) {
+          const phoneField = phoneFields[j]
+          console.log(`Server: Próba z polem: ${phoneField.name} (${phoneField.customFieldId})`)
+
+          const contactPayload = {
+            email: email,
+            name: name,
+            campaign: { campaignId: listId },
+            customFieldValues: [
+              {
+                customFieldId: phoneField.customFieldId,
+                value: [currentPhoneFormat],
+              },
+            ],
+          }
+
+          console.log("Server: Contact payload:", JSON.stringify(contactPayload, null, 2))
+
+          try {
+            const contactResponse = await fetch("https://api.getresponse.com/v3/contacts", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Auth-Token": `api-key ${apiKey}`,
+              },
+              body: JSON.stringify(contactPayload),
+            })
+
+            console.log("Server: Contact creation status:", contactResponse.status)
+
+            if (contactResponse.ok) {
+              const contactParseResult = await safeJsonParse(contactResponse)
+              console.log("Server: ✅ NEW CONTACT ADDED WITH PHONE!")
+              contactCreated = true
+
+              return NextResponse.json({
+                success: true,
+                data: contactParseResult.data,
+                message: "Dodano Cię do listy kontaktów. Skontaktujemy się z Tobą w sprawie webinaru.",
+                debug: {
+                  method: "new_contact_added_with_phone",
+                  listId: listId,
+                  listName: listName,
+                  contactId: contactParseResult.data?.contactId,
+                  phoneFieldUsed: phoneField.name,
+                  phoneFieldId: phoneField.customFieldId,
+                  phoneFormatUsed: currentPhoneFormat,
+                  attemptNumber: i + 1,
+                  fieldAttemptNumber: j + 1,
+                },
+              })
+            } else {
+              const contactErrorResult = await safeJsonParse(contactResponse)
+              console.log(
+                `Server: ❌ Contact creation failed with ${phoneField.name} and format "${currentPhoneFormat}":`,
+                contactErrorResult,
+              )
+              lastError = contactErrorResult
+            }
+          } catch (error) {
+            console.log(`Server: ❌ Error with ${phoneField.name} and format "${currentPhoneFormat}":`, error)
+            lastError = error
+          }
+        }
+      }
+
+      // Jeśli wszystkie próby z telefonem się nie powiodły, dodaj bez telefonu
+      if (!contactCreated) {
+        console.log("Server: Wszystkie próby z telefonem się nie powiodły, dodaję kontakt bez telefonu...")
+
         const simpleContactPayload = {
           email: email,
           name: name,
@@ -306,42 +379,30 @@ export async function POST(request: NextRequest) {
 
         if (simpleContactResponse.ok) {
           const simpleContactParseResult = await safeJsonParse(simpleContactResponse)
-          console.log("Server: ✅ NEW CONTACT ADDED (without phone field)!")
+          console.log("Server: ✅ NEW CONTACT ADDED (without phone)!")
 
           return NextResponse.json({
             success: true,
             data: simpleContactParseResult.data,
             message: "Dodano Cię do listy kontaktów. Skontaktujemy się z Tobą w sprawie webinaru.",
             debug: {
-              method: "new_contact_added_simple",
+              method: "new_contact_added_without_phone",
               listId: listId,
               listName: listName,
               contactId: simpleContactParseResult.data?.contactId,
               phoneIncluded: false,
-              note: "Phone field not supported, contact added without phone",
+              note: "All phone formats failed, contact added without phone",
+              phoneFormatsAttempted: phoneFormats,
+              phoneFieldsAttempted: phoneFields.map((f) => f.name),
+              lastError: lastError,
             },
           })
+        } else {
+          const simpleErrorResult = await safeJsonParse(simpleContactResponse)
+          throw new Error(
+            `Simple contact creation failed: ${simpleContactResponse.status} - ${JSON.stringify(simpleErrorResult.data)}`,
+          )
         }
-
-        // Sprawdź czy to błąd duplikatu
-        if (
-          contactErrorResult.data &&
-          (contactErrorResult.data.code === 1008 ||
-            (typeof contactErrorResult.data === "string" && contactErrorResult.data.includes("already added")))
-        ) {
-          return NextResponse.json({
-            success: true,
-            message: "Jesteś już w naszej bazie kontaktów.",
-            debug: {
-              method: "duplicate_contact_detected",
-              listUsed: listName,
-            },
-          })
-        }
-
-        throw new Error(
-          `Contact creation failed: ${contactResponse.status} - ${contactErrorResult.parseError || "Unknown error"}`,
-        )
       }
     } catch (contactError) {
       console.error("Server: ❌ Contact management error:", contactError)
