@@ -184,7 +184,16 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
               </div>
             )}
 
-            <Button variant="outline" size="sm" onClick={resetForm} className="mt-4 bg-transparent">
+            <Button
+              variant={formStyle === "dark" ? "modern" : "outline"}
+              size="sm"
+              onClick={resetForm}
+              className={`mt-4 ${
+                formStyle === "dark"
+                  ? "bg-gradient-to-r from-gold-600 to-gold-800 text-white hover:from-gold-500 hover:to-gold-700 border-gold/30"
+                  : "bg-navy text-white hover:bg-navy-light border-navy"
+              }`}
+            >
               Zarejestruj kolejną osobę
             </Button>
           </div>
