@@ -228,7 +228,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({
             success: true,
             data: existingContact,
-            message: "Jesteś już w naszej bazie kontaktów. Skontaktujemy się z Tobą w sprawie webinaru.",
+            message: "Jesteś już w naszej bazie kontaktów. Szczegóły webinaru otrzymasz na podany adres email.",
             debug: {
               method: "contact_exists",
               contactId: existingContact.contactId,
@@ -328,7 +328,7 @@ export async function POST(request: NextRequest) {
               return NextResponse.json({
                 success: true,
                 data: contactParseResult.data,
-                message: "Dodano Cię do listy kontaktów. Skontaktujemy się z Tobą w sprawie webinaru.",
+                message: "Dodano Cię do listy kontaktów. Szczegóły webinaru otrzymasz na podany adres email.",
                 debug: {
                   method: "new_contact_added_with_phone",
                   listId: listId,
@@ -384,7 +384,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({
             success: true,
             data: simpleContactParseResult.data,
-            message: "Dodano Cię do listy kontaktów. Skontaktujemy się z Tobą w sprawie webinaru.",
+            message: "Dodano Cię do listy kontaktów. Szczegóły webinaru otrzymasz na podany adres email.",
             debug: {
               method: "new_contact_added_without_phone",
               listId: listId,
