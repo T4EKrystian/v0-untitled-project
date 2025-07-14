@@ -170,9 +170,6 @@ export function WebinarForm({ formStyle = "light", simplified = false }: Webinar
               Dziękujemy za rejestrację!
             </h3>
             <p className={`${formStyle === "dark" ? "text-gray-300" : "text-gray-600"}`}>{submitMessage}</p>
-            <p className={`text-sm mt-2 ${formStyle === "dark" ? "text-gray-400" : "text-gray-500"}`}>
-              Szczegóły webinaru otrzymasz na podany adres email.
-            </p>
 
             {/* Debug info - tylko w development */}
             {debugInfo && process.env.NODE_ENV === "development" && (
